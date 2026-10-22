@@ -1,0 +1,22 @@
+{
+  "name": "anon_4_4_hangzhou_real",
+  "source_roadnet": "data/Hangzhou/4_4/roadnet_4_4.json",
+  "source_flow": "data/Hangzhou/4_4/anon_4_4_hangzhou_real.json",
+  "net_file": "sumo_scenarios/anon_4_4_hangzhou_real/anon_4_4_hangzhou_real.net.xml",
+  "rou_file": "sumo_scenarios/anon_4_4_hangzhou_real/anon_4_4_hangzhou_real.repaired.rou.xml",
+  "sumocfg": "sumo_scenarios/anon_4_4_hangzhou_real/anon_4_4_hangzhou_real.sumocfg",
+  "green_phases_total": 64,
+  "num_phases_per_tls": 4,
+  "phase_offset": 1,
+  "routes_repaired_msgs": 0,
+  "sigma": 0.0,
+  "depart_speed": "max",
+  "num_nodes": 32,
+  "num_signal_nodes": 16,
+  "num_edges": 80,
+  "num_connections": 576,
+  "num_vtypes": 1,
+  "num_vehicles": 2983,
+  "num_from_interval_expansion": 0,
+  "num_flow_entries": 2983
+}

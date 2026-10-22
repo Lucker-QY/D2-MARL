@@ -1,0 +1,22 @@
+{
+  "name": "anon_16_3_newyork_real",
+  "source_roadnet": "data/Newyork/16_3/roadnet_16_3.json",
+  "source_flow": "data/Newyork/16_3/anon_16_3_newyork_real.json",
+  "net_file": "sumo_scenarios/anon_16_3_newyork_real/anon_16_3_newyork_real.net.xml",
+  "rou_file": "sumo_scenarios/anon_16_3_newyork_real/anon_16_3_newyork_real.repaired.rou.xml",
+  "sumocfg": "sumo_scenarios/anon_16_3_newyork_real/anon_16_3_newyork_real.sumocfg",
+  "green_phases_total": 192,
+  "num_phases_per_tls": 4,
+  "phase_offset": 1,
+  "routes_repaired_msgs": 0,
+  "sigma": 0.0,
+  "depart_speed": "max",
+  "num_nodes": 86,
+  "num_signal_nodes": 48,
+  "num_edges": 230,
+  "num_connections": 1728,
+  "num_vtypes": 1,
+  "num_vehicles": 2824,
+  "num_from_interval_expansion": 0,
+  "num_flow_entries": 2824
+}

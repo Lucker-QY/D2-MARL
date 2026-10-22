@@ -1,0 +1,21 @@
+# experiment outputs
+records/
+model/
+errors/
+summary/
+cost_json*/
+safety_raw/
+safety_out/
+figures/
+*.log
+
+# CoordLight sources and training output (cloned and patched locally, see baselines/coordlight)
+coordlight_sumo/CoordLight/
+Train_CityFlow_CoordLight/
+
+# Python / OS
+__pycache__/
+*.py[cod]
+.DS_Store
+.ipynb_checkpoints/
+.venv/

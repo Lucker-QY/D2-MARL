@@ -1,0 +1,22 @@
+{
+  "name": "anon_3_4_jinan_real",
+  "source_roadnet": "data/Jinan/3_4/roadnet_3_4.json",
+  "source_flow": "data/Jinan/3_4/anon_3_4_jinan_real.json",
+  "net_file": "sumo_scenarios/anon_3_4_jinan_real/anon_3_4_jinan_real.net.xml",
+  "rou_file": "sumo_scenarios/anon_3_4_jinan_real/anon_3_4_jinan_real.repaired.rou.xml",
+  "sumocfg": "sumo_scenarios/anon_3_4_jinan_real/anon_3_4_jinan_real.sumocfg",
+  "green_phases_total": 48,
+  "num_phases_per_tls": 4,
+  "phase_offset": 1,
+  "routes_repaired_msgs": 0,
+  "sigma": 0.0,
+  "depart_speed": "max",
+  "num_nodes": 26,
+  "num_signal_nodes": 12,
+  "num_edges": 62,
+  "num_connections": 432,
+  "num_vtypes": 1,
+  "num_vehicles": 6295,
+  "num_from_interval_expansion": 0,
+  "num_flow_entries": 6295
+}

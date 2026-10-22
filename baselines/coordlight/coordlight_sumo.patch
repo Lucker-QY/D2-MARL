@@ -1,0 +1,659 @@
+diff --git a/Driver.py b/Driver.py
+--- a/Driver.py
++++ b/Driver.py
+@@ -1,3 +1,4 @@
++import os
+ import ray
+ import random
+ 
+@@ -353,10 +354,17 @@
+                               "optimizer_state_dict": [global_network.actor_optimizer.state_dict(),
+                                                        global_network.critic_optimizer.state_dict()],
+                               "epoch": curr_episode}
++                # Do not prepend "./": MODEL_PATH may be absolute (CL_TRAIN_ROOT outside
++                # the source tree), and ".//abs/..." would be read as the relative path
++                # "./abs/...", which fails with
++                #   RuntimeError: Parent directory .//abs/.../model_MATSC does not exist
++                # after all training iterations. Same fix as EXPERIMENT_PATH in Parameters.py.
+                 if DEVICE_PARAMS.LOAD_MODEL:
+-                    path_checkpoint = "./" + DEVICE_PARAMS.MODEL_PATH + "/model_MATSC/checkpoint.pkl"
++                    path_checkpoint = os.path.join(
++                        DEVICE_PARAMS.MODEL_PATH, "model_MATSC", "checkpoint.pkl")
+                 else:
+-                    path_checkpoint = "./" + EXPERIMENT_PARAMS.MODEL_PATH + "/checkpoint.pkl"
++                    path_checkpoint = os.path.join(
++                        EXPERIMENT_PARAMS.MODEL_PATH, "checkpoint.pkl")
+ 
+                 torch.save(checkpoint, path_checkpoint)
+ 
+diff --git a/MATSC_gym/envs/MATSC_CityFlow.py b/MATSC_gym/envs/MATSC_CityFlow.py
+--- a/MATSC_gym/envs/MATSC_CityFlow.py
++++ b/MATSC_gym/envs/MATSC_CityFlow.py
+@@ -45,6 +45,7 @@
+         self.sim_yellow_duration = self.env_params.YELLOW_DURATION
+ 
+         self.pre_veh_list_lane_dict = OrderedDict()
++        self.list_of_queue_lengths = []
+ 
+         self.initialization()
+ 
+@@ -122,8 +123,32 @@
+         with open(os.path.join(CITYFLOW_PARAMS.BASE_PATH, config_file_name), "w") as json_file:
+             json.dump(cityflow_config, json_file)
+ 
+-        # Start CityFlow
+-        self.eng = engine.Engine(os.path.join(CITYFLOW_PARAMS.BASE_PATH, config_file_name), thread_num=1)
++        # ---- simulator: CityFlow or SUMO ----------------------------
++        # On SUMO a TraCI back end with exactly the cityflow.Engine interface is used,
++        # so the rest of this file (QDSE observation, neighbourhood reward, phase logic)
++        # is unchanged and the CoordLight method itself is provably the same.
++        use_sumo = str(getattr(CITYFLOW_PARAMS, "SIMULATOR", "cityflow")).lower() == "sumo"
++        if use_sumo:
++            import sys as _sys, os as _os
++            _root = _os.path.dirname(_os.path.dirname(_os.path.dirname(
++                _os.path.dirname(_os.path.abspath(__file__)))))
++            if _root not in _sys.path:
++                _sys.path.insert(0, _root)
++            from cityflow_api_over_sumo import CityFlowSumoEngine
++            self.eng = CityFlowSumoEngine(
++                net_file=CITYFLOW_PARAMS.SUMO_NET_FILE,
++                rou_file=CITYFLOW_PARAMS.SUMO_ROU_FILE,
++                horizon=getattr(CITYFLOW_PARAMS, "HORIZON", 3600),
++                interval=self.env_params.INTERVAL,
++                seed=self.env_params.SEED,
++                label="cl_{0}".format(self.server_number),
++                enable_ssm=getattr(CITYFLOW_PARAMS, "ENABLE_SSM", False),
++                log_dir=CITYFLOW_PARAMS.BASE_PATH)
++        else:
++            # Start CityFlow
++            self.eng = engine.Engine(
++                os.path.join(CITYFLOW_PARAMS.BASE_PATH, config_file_name),
++                thread_num=1)
+ 
+     def reset(self, seed=0):
+         """
+@@ -158,6 +183,7 @@
+         self.cityflow_step = 0
+ 
+         self.pre_veh_list_lane_dict = OrderedDict()
++        self.list_of_queue_lengths = []
+ 
+     def step(self, action_dict):
+         """
+@@ -205,6 +231,25 @@
+         avg_multi_agent_reward = sum(list(rewards_dict.values())) / int(len(self.rl_agent_id))
+         avg_multi_agent_neighbor_reward = sum(list(neighbor_reward_dict.values())) / int(len(self.rl_agent_id))
+ 
++        curr_step_total_queue = sum(
++            self.tls_dict[id].global_lanes_num_wait_veh_dict[in_lane]
++            for id in self.rl_agent_id
++            for in_lane in self.tls_dict[id].incoming_lane_list
++        )
++        self.list_of_queue_lengths.append(curr_step_total_queue)
++
++        vehicle_wait_times_per_tls = {}
++        for id in self.rl_agent_id:
++            veh_dict = self.tls_dict[id].get_dic_vehicle_arrive_leave_time()
++            wait_times = []
++            for veh_id, times in veh_dict.items():
++                wait = self.tls_dict[id].dic_vehicle_cumulative_wait.get(veh_id)
++                if wait is not None:
++                    wait_times.append(wait)
++            vehicle_wait_times_per_tls[id] = wait_times
++
++        eval_metrics_step_dict['vehicle_wait_times_per_tls'] = vehicle_wait_times_per_tls
++
+         return next_obs_dict, rewards_dict, done, [avg_action_change,
+                                                    avg_multi_agent_reward,
+                                                    avg_multi_agent_neighbor_reward,
+@@ -234,12 +279,14 @@
+             global_lanes_veh_id_dict = self.eng.get_lane_vehicles()
+             global_lanes_num_veh_dict = self.eng.get_lane_vehicle_count()
+             global_lanes_num_wait_veh_dict = self.eng.get_lane_waiting_vehicle_count()
++            veh_speed_dict = self.eng.get_vehicle_speed()
++
+             for id in self.agent_id:
+                 self.tls_dict[id].current_time = global_curr_time
+                 self.tls_dict[id].global_lanes_veh_id_dict = global_lanes_veh_id_dict
+                 self.tls_dict[id].global_lanes_num_veh_dict = global_lanes_num_veh_dict
+                 self.tls_dict[id].global_lanes_num_wait_veh_dict = global_lanes_num_wait_veh_dict
+-                self.tls_dict[id].get_vehicle_list()
++                self.tls_dict[id].get_vehicle_list(veh_speed_dict)
+             # self.measure_traffic_step_test()
+ 
+         self.eng.next_step()
+diff --git a/MATSC_gym/envs/Tls_Cityflow.py b/MATSC_gym/envs/Tls_Cityflow.py
+--- a/MATSC_gym/envs/Tls_Cityflow.py
++++ b/MATSC_gym/envs/Tls_Cityflow.py
+@@ -29,8 +29,15 @@
+         self.global_lanes_veh_id_dict = None
+         self.global_lanes_num_wait_veh_dict = None
+         self.dic_vehicle_arrive_leave_time = dict()
++        self.dic_vehicle_cumulative_wait = dict()   # cumulative waiting time (AWT)
++        self.dic_vehicle_current_wait = dict()      # current continuous waiting time
++        self.dic_vehicle_max_wait = dict()          # longest single wait (MWT)
+         self.list_lane_vehicle_current_step = []
+         self.list_lane_vehicle_previous_step = []
++        self.delay_events_90s = []
++        self.recorded_90s_delay = set()
++        self._open_90s = dict()          # veh -> dict of its open event
++        self._veh_lane = dict()          # veh -> current approach lane
+ 
+         # Intersection attributes
+         self.action_space_n = len(self.action_space) - 1
+@@ -49,8 +56,17 @@
+         self.global_lanes_veh_id_dict = None
+         self.global_lanes_num_wait_veh_dict = None
+         self.dic_vehicle_arrive_leave_time = dict()
++        self.dic_vehicle_cumulative_wait = dict()
++        self.dic_vehicle_current_wait = dict()
++        self.dic_vehicle_max_wait = dict()
+         self.list_lane_vehicle_current_step = []
+         self.list_lane_vehicle_previous_step = []
++        
++        # [added] severe-delay event tracker, same definition as D2-MARL
++        self.delay_events_90s = []
++        self.recorded_90s_delay = set()
++        self._open_90s = dict()
++        self._veh_lane = dict()
+ 
+     def get_reward(self):
+         """
+@@ -107,22 +123,62 @@
+             except KeyError:
+                 print("vehicle not recorded when entering")
+ 
+-    def get_vehicle_list(self):
++    def get_vehicle_list(self, veh_speed_dict):
+         """
+         Get the list of vehicles in the intersection (for test)
+         """
+-        # get vehicle list
+         self.list_lane_vehicle_previous_step = []
+-        self.list_lane_vehicle_previous_step += self.list_lane_vehicle_current_step  # store current step
++        self.list_lane_vehicle_previous_step += self.list_lane_vehicle_current_step
+         self.list_lane_vehicle_current_step = []
+-        for lane in self.incoming_lane_list:  # renew current step
+-            self.list_lane_vehicle_current_step += self.global_lanes_veh_id_dict[lane]
++        self._veh_lane = dict()
++        for lane in self.incoming_lane_list:
++            _vs = self.global_lanes_veh_id_dict.get(lane, [])
++            self.list_lane_vehicle_current_step += _vs
++            for _v in _vs:
++                self._veh_lane[_v] = lane
+ 
+-        list_vehicle_new_arrive = list(
+-            set(self.list_lane_vehicle_current_step) - set(self.list_lane_vehicle_previous_step))
+-        list_vehicle_new_left = list(
+-            set(self.list_lane_vehicle_previous_step) - set(self.list_lane_vehicle_current_step))
++        list_vehicle_new_arrive = list(set(self.list_lane_vehicle_current_step) - set(self.list_lane_vehicle_previous_step))
++        list_vehicle_new_left = list(set(self.list_lane_vehicle_previous_step) - set(self.list_lane_vehicle_current_step))
+ 
+-        # update vehicle arrive and left time
+         self._update_arrive_time(list_vehicle_new_arrive)
+         self._update_left_time(list_vehicle_new_left)
++
++        # waiting = real speed < 0.1 m/s
++        for veh in self.list_lane_vehicle_current_step:
++            speed = veh_speed_dict.get(veh, 11.0)
++            if speed < 0.1:  # vehicle stopped
++                self.dic_vehicle_cumulative_wait[veh] = self.dic_vehicle_cumulative_wait.get(veh, 0.0) + 1.0
++                self.dic_vehicle_current_wait[veh] = self.dic_vehicle_current_wait.get(veh, 0.0) + 1.0
++                
++                # update the longest single wait (MWT)
++                if self.dic_vehicle_current_wait[veh] > self.dic_vehicle_max_wait.get(veh, 0.0):
++                    self.dic_vehicle_max_wait[veh] = self.dic_vehicle_current_wait[veh]
++                
++                # [added] 90 s severe-delay events, same logic as D2-MARL.
++                # An event is opened when the wait passes 90 s and its wait_time is
++                # updated every step until the vehicle moves again, so wait_time is
++                # the full length of the wait, as in delay_events_over_90s.csv of
++                # D2-MARL, and Mwt = max(wait_time) is comparable.
++                cw = self.dic_vehicle_current_wait[veh]
++                if cw > 90.0:
++                    if veh not in self.recorded_90s_delay:
++                        evt = {'vehicle_id': veh,
++                               'link': self._veh_lane.get(veh, ''),
++                               'wait_time': cw,
++                               'exceed_time': cw - 90.0,
++                               'end_time': self.current_time}
++                        self.delay_events_90s.append(evt)
++                        self._open_90s[veh] = evt
++                        self.recorded_90s_delay.add(veh)
++                    else:
++                        evt = self._open_90s.get(veh)
++                        if evt is not None:
++                            evt['wait_time'] = cw
++                            evt['exceed_time'] = cw - 90.0
++                            evt['end_time'] = self.current_time
++            else:
++                # vehicle moves: reset the current continuous wait
++                self.dic_vehicle_current_wait[veh] = 0.0
++                if veh in self.recorded_90s_delay:
++                    self.recorded_90s_delay.remove(veh)  # vehicle moves: clear the mark for the next stop
++                    self._open_90s.pop(veh, None)
+diff --git a/Parameters.py b/Parameters.py
+--- a/Parameters.py
++++ b/Parameters.py
+@@ -1,11 +1,20 @@
+ import datetime
++import os as _os
+ 
+ data = datetime.datetime.now()
+ 
+ 
++def _envi(k, d):
++    return int(_os.environ.get(k, d))
++
++
+ class INPUT_PARAMS:
+-    MAX_EPISODES        = 20000
+-    NUM_META_AGENTS     = 4  # [4, 8]
++    # Configurable from outside for SUMO runs:
++    # CL_MAX_EPISODES (e.g. 2 for a smoke test, 100 for training).
++    # NUM_META_AGENTS is the number of Ray workers; each starts its own SUMO
++    # process, so 8 workers need 8 CPUs.
++    MAX_EPISODES        = _envi("CL_MAX_EPISODES", 100)
++    NUM_META_AGENTS     = _envi("CL_NUM_META", 8)  # [4, 8]
+     PL_FACTOR           = 1
+     VL_FACTOR           = 0.5
+     EL_FACTOR           = 0.3
+@@ -15,8 +24,16 @@
+     UPDATE_TYPE         = 'PPO_MAC'
+     CITYFLOW_OBS_TYPE   = 'QDSE'  # ['QDSE', 'VC', 'SVC', 'GP', 'EP', 'ATS', 'DTSE']
+     CITYFLOW_NEI_R_TYPE = 'NEIGHBOR'  # ['NEIGHBOR', 'REGION']
+-    CITYFLOW_MAP_TYPE   = 'DJ'
+-    CITYFLOW_FLOW_TYPE  = '1'  # ['DJ':[1, 2, 3], 'DH':[1, 3] 'DN':[1,2]]
++    # These select the **CityFlow definition files** of network and demand
++    # (roadnet_4_4.json etc.). Even on SUMO, CoordLight reads the intersection topology
++    # and approach lanes from them; only vehicle occupancy comes from SUMO, so they must
++    # match CL_SUMO_NET. With a fixed 'DH' (Hangzhou 4x4) the Jinan/New York SUMO
++    # networks would fail, e.g.
++    #   MATSC_CityFlow.observe_QDSE: KeyError: 'road_2_4_2_2'
++    # (topology from the Hangzhou JSON, occupancy from the Jinan SUMO network).
++    #   DH = Hangzhou 4x4    DJ = Jinan 3x4    DN2 = New York 16x3
++    CITYFLOW_MAP_TYPE   = _os.environ.get("CL_MAP_TYPE", 'DH')
++    CITYFLOW_FLOW_TYPE  = _os.environ.get("CL_FLOW_TYPE", '1')  # ['DJ':[1, 2, 3], 'DH':[1, 3] 'DN':[1,2]]
+     EVAL_TRAFFIC        = False
+     OBS_SHARING         = True
+     REWARD_SHARING      = False
+@@ -30,9 +47,20 @@
+ 
+ class EXPERIMENT_PARAMS:
+     PROJECT_NAME        = 'MATSC_PyTorch'
+-    BASE_PATH           = 'Train_CityFlow_CoordLight'
+-    EXPERIMENT_NAME     = '{}_{}_{}_{}_MATSC_PyTorch_CoordLight_DJ1'.format(data.year, data.month, data.day, data.hour)
+-    EXPERIMENT_PATH     = './{}/{}'.format(BASE_PATH, EXPERIMENT_NAME)
++    # Keep training output outside the source tree: CL_TRAIN_ROOT may point to any
++    # directory (default: 'Train_CityFlow_CoordLight' inside the CoordLight directory).
++    BASE_PATH           = _os.environ.get(
++        "CL_TRAIN_ROOT", 'Train_CityFlow_CoordLight')
++    # The default name contains only year_month_day_hour and a fixed seed1000, so
++    # several runs started within one hour would overwrite each other; it can be set
++    # from outside (scenario and seed in the name).
++    EXPERIMENT_NAME     = _os.environ.get(
++        "CL_EXPERIMENT_NAME",
++        '{}_{}_{}_{}_MATSC_PyTorch_CoordLight_seed1000'.format(
++            data.year, data.month, data.day, data.hour))
++    # os.path.join instead of './{}/{}'.format: the latter turns an absolute path
++    # into a relative one ('.//abs/...' -> './abs/...').
++    EXPERIMENT_PATH     = _os.path.join(BASE_PATH, EXPERIMENT_NAME)
+     MODEL_PATH          = EXPERIMENT_PATH + '/model_MATSC'
+     GIFS_PATH           = EXPERIMENT_PATH + '/gifs_MATSC'
+     TRAIN_PATH          = EXPERIMENT_PATH + '/train_MATSC'
+@@ -50,30 +78,42 @@
+     BUFFER_SIZE         = INPUT_PARAMS.BUFFER_SIZE
+     WANDB               = False
+     OUTPUT_GIFS         = False
+-    USE_GPU             = True
+-    NUM_GPU             = 1
++    USE_GPU             = _os.environ.get("CL_USE_GPU", "1") == "1"
++    NUM_GPU             = _envi("CL_NUM_GPU", 1)
+     SAVE_MODEL_STEP     = 100
+-    SUMMARY_WINDOW      = 30
++    SUMMARY_WINDOW      = 20
+ 
+ 
+ class CITYFLOW_PARAMS:
+     EVAL_NET            = INPUT_PARAMS.CITYFLOW_MAP_TYPE
+     EVAL_FLOW           = INPUT_PARAMS.CITYFLOW_FLOW_TYPE
+     INTERVAL            = 1
+-    SEED                = 0
+-    RANDOM_SEED         = True
++    # The seed must be controllable and randomisation switchable, otherwise three
++    # "seeds" would be draws from the same distribution and the reported std meaningless.
++    SEED                = _envi("CL_SEED", 1000)
++    RANDOM_SEED         = _os.environ.get("CL_RANDOM_SEED", "1") == "1"
+     LANE_CHANGE         = False
+     RL_TRAFFIC_LIGHT    = True
+     SAVE_REPLAY         = False
+     MAX_SIMULATION_STEP = 3600
+-    GREEN_DURATION      = 5
+-    YELLOW_DURATION     = 2
+-    PHASE_SIZE          = 8
++    GREEN_DURATION      = 15
++    YELLOW_DURATION     = 5
++    PHASE_SIZE          = 4
+     MEASURE_STEP        = INPUT_PARAMS.EVAL_TRAFFIC
+     OBS_TYPE            = INPUT_PARAMS.CITYFLOW_OBS_TYPE
+     OBS_SHARING         = INPUT_PARAMS.OBS_SHARING
+     REWARD_SHARING      = INPUT_PARAMS.REWARD_SHARING
+     NEIGHBOR_R_TYPE     = INPUT_PARAMS.CITYFLOW_NEI_R_TYPE
++    # ===== SUMO support (via cityflow_api_over_sumo.CityFlowSumoEngine) =====
++    # controlled by environment variables, so the source need not change per scenario:
++    #   CL_SIMULATOR=sumo  CL_SUMO_NET=xxx.net.xml  CL_SUMO_ROU=xxx.rou.xml
++    import os as _os
++    SIMULATOR      = _os.environ.get("CL_SIMULATOR", "cityflow")
++    SUMO_NET_FILE  = _os.environ.get("CL_SUMO_NET", "")
++    SUMO_ROU_FILE  = _os.environ.get("CL_SUMO_ROU", "")
++    HORIZON        = int(_os.environ.get("CL_HORIZON", "3600"))
++    ENABLE_SSM     = _os.environ.get("CL_ENABLE_SSM", "0") == "1"
++
+ 
+     if EVAL_NET == 'G6U':
+         BASE_FILE   = 'template_lsr/6_6/'
+diff --git a/Runner.py b/Runner.py
+--- a/Runner.py
++++ b/Runner.py
+@@ -119,7 +119,8 @@
+             self.action_change += info[0]
+             self.episode_reward += info[1]
+             for k, v in info[5].items():
+-                self.episode_eval_metrics[k].append(v)
++                if k in self.episode_eval_metrics:  # [added] skip the extra metric dicts that are not used for training monitoring
++                    self.episode_eval_metrics[k].append(v)
+ 
+             # s = s1
+             observations = next_observations
+diff --git a/Tester.py b/Tester.py
+--- a/Tester.py
++++ b/Tester.py
+@@ -1,3 +1,4 @@
++import argparse
+ import os
+ import time
+ import torch
+@@ -36,10 +37,27 @@
+         self.initialization()
+ 
+     def set_weights(self):
+-        # weights = torch.load(self.model_path + '/model_MATSC/state_dict.pth', map_location=self.device)
+-        # self.network.load_state_dict(weights)
+-        checkpoint = torch.load(self.model_path + '/model_MATSC/checkpoint.pkl', map_location=self.device)
+-        self.network.load_state_dict(checkpoint['model_state_dict'])
++        """Load checkpoint.pkl if present, otherwise state_dict.pth.
++
++        Driver saves state_dict.pth after every iteration but checkpoint.pkl only
++        every SAVE_MODEL_STEP iterations. Evaluation needs only the network
++        weights; the optimizer state and epoch in the checkpoint are not used for
++        inference, so falling back to state_dict.pth is equivalent.
++        """
++        ckpt = os.path.join(self.model_path, 'model_MATSC', 'checkpoint.pkl')
++        sdict = os.path.join(self.model_path, 'model_MATSC', 'state_dict.pth')
++        if os.path.exists(ckpt):
++            checkpoint = torch.load(ckpt, map_location=self.device)
++            self.network.load_state_dict(checkpoint['model_state_dict'])
++            print("[Tester] weights from checkpoint.pkl")
++        elif os.path.exists(sdict):
++            weights = torch.load(sdict, map_location=self.device)
++            self.network.load_state_dict(weights)
++            print("[Tester] no checkpoint.pkl, weights from state_dict.pth (equivalent)")
++        else:
++            raise SystemExit(
++                "%s/model_MATSC contains neither checkpoint.pkl nor state_dict.pth"
++                % self.model_path)
+         self.network.eval()
+ 
+     def initialization(self):
+@@ -63,6 +81,12 @@
+         self.curr_episode = curr_episode
+         self.env.curr_episode = curr_episode
+         observations = self.env.reset(eval_seed)
++
++        self.all_step_queues = []
++        # AWT in D2-MARL is "mean over steps of the mean current wait of the waiting
++        # vehicles", while CoordLight reports "mean over vehicles of the cumulative wait"
++        # (13.7 vs 49.7 s on Hangzhou-1). Both are computed; the tables use the former.
++        self.all_step_awts = []
+         while True:
+             action_dict = OrderedDict()
+ 
+@@ -89,6 +113,23 @@
+ 
+             next_observations, rewards, done, info = self.env.step(action_dict=action_dict)
+ 
++            step_q = []
++            lane_wait_dict = self.env.eng.get_lane_waiting_vehicle_count()
++            for tls in self.env.tls_dict.values():
++                for lane in tls.incoming_lane_list:
++                    step_q.append(lane_wait_dict.get(lane, 0))
++            self.all_step_queues.append(step_q)
++
++            # dic_vehicle_current_wait corresponds to waiting_vehicle_list[veh]['time']
++            # in D2-MARL (current continuous wait, reset when the vehicle moves),
++            # so "value > 0" means "currently in the waiting list" as in D2-MARL.
++            _cur = []
++            for tls in self.env.tls_dict.values():
++                for _w in tls.dic_vehicle_current_wait.values():
++                    if _w > 0:
++                        _cur.append(_w)
++            self.all_step_awts.append(float(np.mean(_cur)) if _cur else 0.0)
++
+             self.episode_step += 1
+             self.action_change += info[0]
+             self.episode_reward += info[1]
+@@ -101,17 +142,27 @@
+ 
+         # generate evaluation data
+         avg_duration = self.calculate_cityflow_eval_data()
++
++        awt, max_wait, aql, over_limit_count, gini_index, global_veh_stats = self.calculate_advanced_metrics()
+         run_time = time.time() - start_time
+-        print("{} | Reward: {}, Length: {}, Run Time: {:.2f} s".format(self.curr_episode,
+-                                                                       self.episode_reward,
+-                                                                       self.episode_step,
+-                                                                       run_time))
+ 
++        print("{} | Reward: {}, Length: {}, Run Time: {:.2f} s".format(
++            self.curr_episode, self.episode_reward, self.episode_step, run_time))
++        print("  [Advanced] AWT: {:.2f}s | MaxWait: {:.2f}s | AQL: {:.2f} | "
++              "OverLimit(>90s): {} | Gini: {:.4f}".format(
++                  awt, max_wait, aql, over_limit_count, gini_index))
++        print("  [reference] CoordLight's own AWT (mean cumulative wait per vehicle): {:.2f}s"
++              " (not used in the tables; different definition from the other baselines)".format(
++                  getattr(self, "awt_per_vehicle", float("nan"))))
++
++        self.output_advanced_metrics_to_csv(self.curr_episode, global_veh_stats)
++
+         perf_metrics = [self.episode_reward,
+                         self.action_change / self.episode_step,
+                         avg_duration]
++        adv_metrics = [awt, max_wait, aql, over_limit_count, gini_index]
+ 
+-        return perf_metrics
++        return perf_metrics, adv_metrics
+ 
+     def calculate_cityflow_eval_data(self):
+         """
+@@ -151,15 +202,107 @@
+ 
+         return ave_duration
+ 
+-    def output_cityflow_eval_data(self, data_list):
++    def calculate_advanced_metrics(self):
++        global_veh_stats = {}
++        total_overlimit_events = 0  # number of waits longer than 90 s
++        
++        for tls in self.env.tls_dict.values():
++            # add up the 90 s events counted at each intersection
++            total_overlimit_events += len(tls.delay_events_90s)
++            
++            for veh_id, cumulative_wait in tls.dic_vehicle_cumulative_wait.items():
++                if veh_id not in global_veh_stats:
++                    global_veh_stats[veh_id] = {'cumulative_wait': 0.0, 'max_wait': 0.0}
++                
++                # total waiting time of this vehicle over the whole network
++                global_veh_stats[veh_id]['cumulative_wait'] += cumulative_wait
++                
++                # longest single wait of this vehicle over its whole trip
++                max_wait = tls.dic_vehicle_max_wait.get(veh_id, 0.0)
++                if max_wait > global_veh_stats[veh_id]['max_wait']:
++                    global_veh_stats[veh_id]['max_wait'] = max_wait
++
++        # all_awt_times equals vehicle_total_wait_time of D2-MARL
++        all_awt_times = [v['cumulative_wait'] for v in global_veh_stats.values()]
++        all_mwt_times = [v['max_wait'] for v in global_veh_stats.values()]
++
++        # For reference: CoordLight's original "mean cumulative wait per vehicle". **Not used
++        # in the tables**, because all other baselines use the D2-MARL definition.
++        awt_per_vehicle = np.mean(all_awt_times) if all_awt_times else 0.0
++        max_wait = np.max(all_mwt_times) if all_mwt_times else 0.0
++
++        # ---- the next two use the D2-MARL definitions (utils/model_test.py) ----
++        # AWT: per step the mean current wait of the waiting vehicles, then the mean over steps.
++        awt = float(np.mean(self.all_step_awts)) if self.all_step_awts else 0.0
++
++        # AQL: per step the **total number of queued vehicles** in the network, then the mean over steps.
++        # The original mean(mean(queues, axis=0)) averages over steps and then over lanes,
++        # i.e. a per-lane mean, smaller than D2-MARL's AQL by the number of lanes
++        # (Hangzhou-1: 0.16 vs 22.7 with 192 approach lanes).
++        if len(self.all_step_queues) > 0:
++            aql = float(np.mean([float(np.sum(q)) for q in self.all_step_queues]))
++        else:
++            aql = 0.0
++
++        # ==== Gini coefficient with the same formula as D2-MARL ====
++        if len(all_awt_times) > 0:
++            wait_array = np.array(all_awt_times, dtype=np.float64)
++            wait_array = np.sort(wait_array)
++            n = len(wait_array)
++            index = np.arange(1, n + 1)
++            # same formula as utils/model_test.py of D2-MARL
++            gini_index = ((2 * index - n - 1) * wait_array).sum() / (n * wait_array.sum() + 1e-8)
++        else:
++            gini_index = 0.0
++
++        self.awt_per_vehicle = awt_per_vehicle
++        return awt, max_wait, aql, total_overlimit_events, gini_index, global_veh_stats
++
++    def output_advanced_metrics_to_csv(self, curr_episode, global_veh_stats):
++        records = []
++        delay_90s_records = []
++
++        for veh_id, stats in global_veh_stats.items():
++            record = {
++                'episode': curr_episode,
++                'vehicle_id': veh_id,
++                'cumulative_wait_sec': stats['cumulative_wait'],
++                'max_wait_sec': stats['max_wait']
++            }
++            records.append(record)
++
++            if stats['max_wait'] > 90:
++                delay_90s_records.append(record)
++
++        df_all = pd.DataFrame(records)
++        df_delay = pd.DataFrame(delay_90s_records)
++
++        all_path = os.path.join(self.model_path, "all_vehicles_wait_time.csv")
++        delay_path = os.path.join(self.model_path, "delay_events_over_90s.csv")
++
++        df_all.to_csv(all_path, mode='a', header=not os.path.exists(all_path), index=False)
++        if not df_delay.empty or not os.path.exists(delay_path):
++            df_delay.to_csv(delay_path, mode='a', header=not os.path.exists(delay_path), index=False)
++
++    def output_cityflow_eval_data(self, data_list, adv_metrics_list):
+         """
+-        Output and save the evaluation results/average trip time
++        Output and save the evaluation results/average trip time & Advanced Metrics
+         """
+         with open(self.model_path + "/result.txt", "w+") as f:
+-            f.write("Average travel time: {0} \n".format(np.nanmean(data_list)))
+-            f.write("Max travel time: {0} \n".format(np.nanmax(data_list)))
+-            f.write("Min travel time: {0} \n".format(np.nanmin(data_list)))
+-            f.write("All average travel time: {0} \n".format(data_list))
++            f.write("========== Standard Metrics ==========\n")
++            f.write("Average travel time: {:.2f} \n".format(np.nanmean(data_list)))
++            f.write("Max travel time: {:.2f} \n".format(np.nanmax(data_list)))
++            f.write("Min travel time: {:.2f} \n".format(np.nanmin(data_list)))
++            f.write("All average travel time: {} \n\n".format(data_list))
++
++            f.write("========== Advanced Metrics ==========\n")
++            adv_arr = np.array(adv_metrics_list)
++            f.write("Average AWT: {:.2f} s\n".format(np.mean(adv_arr[:, 0])))
++            f.write("Average MaxWait: {:.2f} s\n".format(np.mean(adv_arr[:, 1])))
++            f.write("Average AQL: {:.2f} vehs\n".format(np.mean(adv_arr[:, 2])))
++            f.write("Average OverLimit (>90s) events: {:.2f} \n".format(np.mean(adv_arr[:, 3])))
++            f.write("Average Gini Index: {:.4f} \n".format(np.mean(adv_arr[:, 4])))
++
+         print("======== Generating results =======\n")
+ 
+     def output_cityflow_step_eval_data(self):
+@@ -173,22 +316,40 @@
+ 
+ 
+ if __name__ == '__main__':
+-    args_dict = dict()
++    parser = argparse.ArgumentParser(description="Tester for CoordLight")
++    parser.add_argument("--test_path", type=str, required=True, help="base path, with a trailing slash")
++    parser.add_argument("--experiment_name", type=str, required=True, help="experiment folder name (no slash)")
++    parser.add_argument("--seed", type=int, default=1000, help="test random seed")
++    parser.add_argument("--num_test", type=int, default=1, help="number of test episodes")
++    parser.add_argument("--use_cpu", action="store_true", default=False, help="test on the CPU")
+ 
+-    args_dict['seed'] = 1000
+-    args_dict['num_test'] = 10
+-    args_dict['use_gpu'] = True
++    args = parser.parse_args()
++
++    args_dict = dict()
++    args_dict['seed'] = args.seed
++    args_dict['num_test'] = args.num_test
++    args_dict['use_gpu'] = not args.use_cpu
+     args_dict['env_type'] = 'CITYFLOW'
+-    args_dict['test_path'] = None
+-    args_dict['experiment_name'] = None
++    args_dict['test_path'] = args.test_path
++    args_dict['experiment_name'] = args.experiment_name
+ 
+-    total_output_list = []
+     tester = Tester(meta_agent_id=0, args_dict=args_dict)
+ 
++    csv_all = os.path.join(tester.model_path, "all_vehicles_wait_time.csv")
++    csv_delay = os.path.join(tester.model_path, "delay_events_over_90s.csv")
++    if os.path.exists(csv_all):
++        os.remove(csv_all)
++    if os.path.exists(csv_delay):
++        os.remove(csv_delay)
++
+     total_outputs = []
++    total_adv_metrics = []
++
+     for i in range(args_dict['num_test']):
+-        seed = args_dict.seed + i * 100
+-        eval_output = tester.run_episode_single_threaded(curr_episode=i, eval_seed=seed)
++        seed = args_dict['seed'] + i * 100
++        eval_output, adv_metrics = tester.run_episode_single_threaded(curr_episode=i, eval_seed=seed)
++
+         total_outputs.append(eval_output[2])
+-    tester.output_cityflow_eval_data(total_outputs)
+-    # tester.output_cityflow_step_eval_data()
++        total_adv_metrics.append(adv_metrics)
++
++    tester.output_cityflow_eval_data(total_outputs, total_adv_metrics)
+diff --git a/Utils.py b/Utils.py
+--- a/Utils.py
++++ b/Utils.py
+@@ -306,8 +306,10 @@
+     @param dir:
+     @return:
+     """
+-    if not os.path.exists(dir):
+-        os.makedirs(dir)
++    # exist_ok=True avoids a race (`if not exists: makedirs`) when several jobs
++    # start at the same time and share the parent directory; the later one would fail with
++    #   FileExistsError: [Errno 17] File exists: 'Train_CityFlow_CoordLight'
++    os.makedirs(dir, exist_ok=True)
+ 
+ 
+ def create_dirs(params):

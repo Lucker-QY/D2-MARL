@@ -1,0 +1,1701 @@
+diff --git a/run_RL_transfer.py b/run_RL_transfer.py
+--- a/run_RL_transfer.py
++++ b/run_RL_transfer.py
+@@ -5,7 +5,6 @@
+ import time
+ from utils.RL_transfer_test import test_transfer
+ import argparse
+-import wandb
+ 
+ 
+ def parse_args():
+@@ -21,10 +20,39 @@
+     parser.add_argument("-traffic_file", type=str, default="anon_3_4_jinan_synthetic_24000_60min.json")
+     parser.add_argument("-traffic_file_source", type=str, default="anon_3_4_jinan_real.json")
+ 
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -64,6 +92,7 @@
+     print(in_args.traffic_file)
+ 
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_AGENTS": num_intersections,
+         "NUM_INTERSECTIONS": num_intersections,
+ 
+@@ -168,15 +197,8 @@
+     dic_agent_conf = merge(dic_agent_conf_extra, dic_base_agent_conf)
+     dic_traffic_env_conf = merge(config.dic_traffic_env_conf, dic_traffic_env_conf_extra)
+ 
+-    logger = wandb.init(
+-        group=f"{dic_traffic_env_conf['MODEL_NAME']}-{dic_traffic_env_conf['TRAFFIC_FILE_SOURCE']}-to-{dic_traffic_env_conf['TRAFFIC_FILE']}",
+-        project=dic_traffic_env_conf['PROJECT_NAME'],
+-        name="round_0",
+-        config=dic_traffic_env_conf,
+-    )
+     results = test_transfer(dic_path_extra["PATH_TO_DATA"], dic_traffic_env_conf, dic_agent_conf)
+-    logger.log(results)
+-    print(results)
++    print("Transfer test results:", results)
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/run_advanced_colight.py b/run_advanced_colight.py
+--- a/run_advanced_colight.py
++++ b/run_advanced_colight.py
+@@ -15,14 +15,43 @@
+     parser.add_argument("--eightphase", action="store_true", default=False)
+     parser.add_argument("--gen", type=int, default=1)
+     parser.add_argument("--multi_process", action="store_true", default=True)
+-    parser.add_argument("--workers", type=int, default=1)
++    parser.add_argument("--workers", type=int, default=8)
+     parser.add_argument("--dataset", type=str, default="newyork_28x7")
+     parser.add_argument("--traffic_file", type=str, default="anon_28_7_newyork_real_triple.json")
+-    parser.add_argument("--duration", type=int, default=30)
++    parser.add_argument("--duration", type=int, default=15)
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args=None):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -44,6 +73,12 @@
+         traffic_file_list = ["anon_28_7_newyork_real_double.json", "anon_28_7_newyork_real_triple.json"]
+         num_rounds = 100
+         template = "NewYork"
++    elif in_args.dataset == 'newyork_16x3':
++        count = 3600
++        road_net = "16_3"
++        traffic_file_list = ["anon_16_3_newyork_real.json"]
++        num_rounds = 100
++        template = "NewYork"
+ 
+     # flow_file error
+     try:
+@@ -64,6 +99,7 @@
+     deploy_dic_agent_conf = merge(getattr(config, "DIC_BASE_AGENT_CONF"), dic_agent_conf_extra)
+ 
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_ROUNDS": num_rounds,
+         "NUM_GENERATORS": in_args.gen,
+         "NUM_AGENTS": 1,
+diff --git a/run_attendlight.py b/run_attendlight.py
+--- a/run_attendlight.py
++++ b/run_attendlight.py
+@@ -19,11 +19,40 @@
+     parser.add_argument("--hangzhou", action="store_true", default=False)
+     parser.add_argument("--dataset", type=str, default="jinan")
+     parser.add_argument("--traffic_file", type=str, default="anon_3_4_jinan_real.json")
+-    parser.add_argument("--duration", type=int, default=30)
++    parser.add_argument("--duration", type=int, default=15)
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args=None):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -45,6 +74,12 @@
+         traffic_file_list = ["anon_28_7_newyork_real_double.json", "anon_28_7_newyork_real_triple.json"]
+         num_rounds = 100
+         template = "NewYork"
++    elif in_args.dataset == 'newyork_16x3':
++        count = 3600
++        road_net = "16_3"
++        traffic_file_list = ["anon_16_3_newyork_real.json"]
++        num_rounds = 100
++        template = "NewYork"
+ 
+     # flow_file error
+     try:
+@@ -60,6 +95,7 @@
+     print(in_args.traffic_file)
+     process_list = []
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_ROUNDS": num_rounds,
+         "NUM_GENERATORS": in_args.gen,
+         "NUM_AGENTS": 1,
+diff --git a/run_chatgpt.py b/run_chatgpt.py
+--- a/run_chatgpt.py
++++ b/run_chatgpt.py
+@@ -21,10 +21,39 @@
+     parser.add_argument("--dataset", type=str, default="jinan")
+     parser.add_argument("--traffic_file", type=str, default="anon_3_4_jinan_real.json")
+ 
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -75,6 +104,7 @@
+     }
+ 
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_AGENTS": num_intersections,
+         "NUM_INTERSECTIONS": num_intersections,
+ 
+diff --git a/run_colight.py b/run_colight.py
+--- a/run_colight.py
++++ b/run_colight.py
+@@ -18,11 +18,40 @@
+     parser.add_argument("--workers", type=int, default=1)
+     parser.add_argument("--dataset", type=str, default="jinan")
+     parser.add_argument("--traffic_file", type=str, default="anon_3_4_jinan_real.json")
+-    parser.add_argument("--duration", type=int, default=30)
++    parser.add_argument("--duration", type=int, default=15)
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args=None):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -44,6 +73,12 @@
+         traffic_file_list = ["anon_28_7_newyork_real_double.json", "anon_28_7_newyork_real_triple.json"]
+         num_rounds = 100
+         template = "NewYork"
++    elif in_args.dataset == 'newyork_16x3':
++        count = 3600
++        road_net = "16_3"
++        traffic_file_list = ["anon_16_3_newyork_real.json"]
++        num_rounds = 100
++        template = "NewYork"
+ 
+     # flow_file error
+     try:
+@@ -64,6 +99,7 @@
+     deploy_dic_agent_conf = merge(getattr(config, "DIC_BASE_AGENT_CONF"), dic_agent_conf_extra)
+ 
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+ 
+         "NUM_ROUNDS": num_rounds,
+         "NUM_GENERATORS": in_args.gen,
+diff --git a/run_efficient_colight.py b/run_efficient_colight.py
+--- a/run_efficient_colight.py
++++ b/run_efficient_colight.py
+@@ -15,14 +15,43 @@
+     parser.add_argument("--eightphase", action="store_true", default=False)
+     parser.add_argument("--gen", type=int, default=1)
+     parser.add_argument("--multi_process", action="store_true", default=True)
+-    parser.add_argument("--workers", type=int, default=1)
++    parser.add_argument("--workers", type=int, default=8)
+     parser.add_argument("--dataset", type=str, default="newyork_28x7")
+     parser.add_argument("--traffic_file", type=str, default="anon_28_7_newyork_real_triple.json")
+-    parser.add_argument("--duration", type=int, default=30)
++    parser.add_argument("--duration", type=int, default=15)
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args=None):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -44,6 +73,12 @@
+         traffic_file_list = ["anon_28_7_newyork_real_double.json", "anon_28_7_newyork_real_triple.json"]
+         num_rounds = 100
+         template = "NewYork"
++    elif in_args.dataset == 'newyork_16x3':
++        count = 3600
++        road_net = "16_3"
++        traffic_file_list = ["anon_16_3_newyork_real.json"]
++        num_rounds = 100
++        template = "NewYork"
+ 
+     # flow_file error
+     try:
+@@ -64,6 +99,7 @@
+     deploy_dic_agent_conf = merge(getattr(config, "DIC_BASE_AGENT_CONF"), dic_agent_conf_extra)
+ 
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_ROUNDS": num_rounds,
+         "NUM_GENERATORS": in_args.gen,
+         "NUM_AGENTS": 1,
+diff --git a/run_fixedtime.py b/run_fixedtime.py
+--- a/run_fixedtime.py
++++ b/run_fixedtime.py
+@@ -21,10 +21,39 @@
+     parser.add_argument("--dataset", type=str, default="jinan")
+     parser.add_argument("--traffic_file", type=str, default="anon_3_4_jinan_real.json")
+ 
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -44,6 +73,12 @@
+         road_net = "28_7"
+         traffic_file_list = ["anon_28_7_newyork_real_double.json", "anon_28_7_newyork_real_triple.json"]
+         template = "NewYork"
++    elif in_args.dataset == 'newyork_16x3':
++        count = 3600
++        road_net = "16_3"
++        traffic_file_list = ["anon_16_3_newyork_real.json"]
++        num_rounds = 150
++        template = "NewYork"
+ 
+     if "24h" in in_args.traffic_file:
+         count = 86400
+@@ -62,6 +97,7 @@
+     print(in_args.traffic_file)
+     process_list = []
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_AGENTS": num_intersections,
+         "NUM_INTERSECTIONS": num_intersections,
+         "MODEL_NAME": in_args.model,
+diff --git a/run_maxpressure.py b/run_maxpressure.py
+--- a/run_maxpressure.py
++++ b/run_maxpressure.py
+@@ -17,10 +17,39 @@
+     parser.add_argument("--dataset", type=str, default="jinan")
+     parser.add_argument("--traffic_file", type=str, default="anon_3_4_jinan_real.json")
+ 
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -40,6 +69,12 @@
+         road_net = "28_7"
+         traffic_file_list = ["anon_28_7_newyork_real_double.json", "anon_28_7_newyork_real_triple.json"]
+         template = "NewYork"
++    elif in_args.dataset == 'newyork_16x3':
++        count = 3600
++        road_net = "16_3"
++        traffic_file_list = ["anon_16_3_newyork_real.json"]
++        num_rounds = 150
++        template = "NewYork"
+ 
+     if "24h" in in_args.traffic_file:
+         count = 86400
+@@ -59,6 +94,7 @@
+     process_list = []
+ 
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_AGENTS": num_intersections,
+         "NUM_INTERSECTIONS": num_intersections,
+ 
+diff --git a/run_mplight.py b/run_mplight.py
+--- a/run_mplight.py
++++ b/run_mplight.py
+@@ -13,16 +13,45 @@
+     parser.add_argument("--model", type=str, default="MPLight")
+     parser.add_argument("--proj_name", type=str, default="chatgpt-TSCS-debug")
+     parser.add_argument("--eightphase", action="store_true", default=False)
+-    parser.add_argument("--duration", type=int, default=30)
++    parser.add_argument("--duration", type=int, default=15)
+     parser.add_argument("--gen", type=int, default=1)
+     parser.add_argument("--multi_process", action="store_true", default=True)
+     parser.add_argument("--workers", type=int, default=1)
+     parser.add_argument("--dataset", type=str, default="jinan")
+     parser.add_argument("--traffic_file", type=str, default="anon_3_4_jinan_real.json")
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args=None):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -44,7 +73,13 @@
+         traffic_file_list = ["anon_28_7_newyork_real_double.json", "anon_28_7_newyork_real_triple.json"]
+         num_rounds = 100
+         template = "NewYork"
+-
++    elif in_args.dataset == 'newyork_16x3':
++        count = 3600
++        road_net = "16_3"
++        traffic_file_list = ["anon_16_3_newyork_real.json"]
++        num_rounds = 100
++        template = "NewYork"
++        
+     # flow_file error
+     try:
+         if in_args.traffic_file not in traffic_file_list:
+@@ -59,6 +94,7 @@
+     print(in_args.traffic_file)
+     process_list = []
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_ROUNDS": num_rounds,
+         "NUM_GENERATORS": in_args.gen,
+         "NUM_AGENTS": 1,
+diff --git a/run_open_LLM.py b/run_open_LLM.py
+--- a/run_open_LLM.py
++++ b/run_open_LLM.py
+@@ -11,19 +11,48 @@
+     parser.add_argument("--memo", type=str, default='LLMTLCSRun')
+     parser.add_argument("--llm_model", type=str, default="llama_cgpr_13b_jinan_1")
+     parser.add_argument("--llm_path", type=str, default="./ft_models/merged/llama_cgpr_13b_jinan_1")
+-    parser.add_argument("--num_rounds", type=int, default=1)
++    parser.add_argument("--num_rounds", type=int, default=3)
+     parser.add_argument("--new_max_tokens", type=int, default=1024)
+     parser.add_argument("--proj_name", type=str, default="LLM-TSCS-extreme")
+     parser.add_argument("--eightphase", action="store_true", default=False)
+     parser.add_argument("--multi_process", action="store_true", default=True)
+-    parser.add_argument("--workers", type=int, default=1)
++    parser.add_argument("--workers", type=int, default=8)
+     parser.add_argument("--dataset", type=str, default="template")
+     parser.add_argument("--traffic_file", type=str, default="flow_main_stream.json")
+ 
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -74,6 +103,7 @@
+     }
+ 
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_AGENTS": num_intersections,
+         "NUM_INTERSECTIONS": num_intersections,
+ 
+@@ -110,10 +140,10 @@
+         }
+         dic_traffic_env_conf_extra["PHASE_LIST"] = ['WT_ET', 'NT_ST', 'WL_EL', 'NL_SL',
+                                                     'WL_WT', 'EL_ET', 'SL_ST', 'NL_NT']
+-        dic_agent_conf_extra["FIXED_TIME"] = [30, 30, 30, 30, 30, 30, 30, 30]
++        dic_agent_conf_extra["FIXED_TIME"] = [15, 15, 15, 15, 15, 15, 15, 15]
+ 
+     else:
+-        dic_agent_conf_extra["FIXED_TIME"] = [30, 30, 30, 30]
++        dic_agent_conf_extra["FIXED_TIME"] = [15, 15, 15, 15]
+ 
+     dic_traffic_env_conf_extra["NUM_AGENTS"] = dic_traffic_env_conf_extra["NUM_INTERSECTIONS"]
+     dic_path_extra = {
+diff --git a/run_open_LLM_with_vllm.py b/run_open_LLM_with_vllm.py
+--- a/run_open_LLM_with_vllm.py
++++ b/run_open_LLM_with_vllm.py
+@@ -12,19 +12,48 @@
+     parser.add_argument("--memo", type=str, default='LLMTLCSRun')
+     parser.add_argument("--llm_model", type=str, default="llama_cgpr_13b_jinan_1")
+     parser.add_argument("--llm_path", type=str, default="./ft_models/merged/llama_cgpr_13b_jinan_1")
+-    parser.add_argument("--num_rounds", type=int, default=1)
++    parser.add_argument("--num_rounds", type=int, default=3)
+     parser.add_argument("--new_max_tokens", type=int, default=1024)
+     parser.add_argument("--proj_name", type=str, default="LLM-TSCS-extreme")
+     parser.add_argument("--eightphase", action="store_true", default=False)
+     parser.add_argument("--multi_process", action="store_true", default=True)
+-    parser.add_argument("--workers", type=int, default=1)
++    parser.add_argument("--workers", type=int, default=8)
+     parser.add_argument("--dataset", type=str, default="template")
+     parser.add_argument("--traffic_file", type=str, default="flow_main_stream.json")
+ 
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -76,6 +105,7 @@
+     }
+ 
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_AGENTS": num_intersections,
+         "NUM_INTERSECTIONS": num_intersections,
+ 
+@@ -112,10 +142,10 @@
+         }
+         dic_traffic_env_conf_extra["PHASE_LIST"] = ['WT_ET', 'NT_ST', 'WL_EL', 'NL_SL',
+                                                     'WL_WT', 'EL_ET', 'SL_ST', 'NL_NT']
+-        dic_agent_conf_extra["FIXED_TIME"] = [30, 30, 30, 30, 30, 30, 30, 30]
++        dic_agent_conf_extra["FIXED_TIME"] = [15, 15, 15, 15, 15, 15, 15, 15]
+ 
+     else:
+-        dic_agent_conf_extra["FIXED_TIME"] = [30, 30, 30, 30]
++        dic_agent_conf_extra["FIXED_TIME"] = [15, 15, 15, 15]
+ 
+     dic_traffic_env_conf_extra["NUM_AGENTS"] = dic_traffic_env_conf_extra["NUM_INTERSECTIONS"]
+     dic_path_extra = {
+diff --git a/run_presslight.py b/run_presslight.py
+--- a/run_presslight.py
++++ b/run_presslight.py
+@@ -18,11 +18,40 @@
+     parser.add_argument("--workers", type=int, default=1)
+     parser.add_argument("--dataset", type=str, default="jinan")
+     parser.add_argument("--traffic_file", type=str, default="anon_3_4_jinan_real.json")
+-    parser.add_argument("--duration", type=int, default=30)
++    parser.add_argument("--duration", type=int, default=15)
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args=None):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -44,6 +73,12 @@
+         traffic_file_list = ["anon_28_7_newyork_real_double.json", "anon_28_7_newyork_real_triple.json"]
+         num_rounds = 100
+         template = "NewYork"
++    elif in_args.dataset == 'newyork_16x3':
++        count = 3600
++        road_net = "16_3"
++        traffic_file_list = ["anon_16_3_newyork_real.json"]
++        num_rounds = 100
++        template = "NewYork"
+ 
+     # flow_file error
+     try:
+@@ -60,6 +95,7 @@
+     process_list = []
+ 
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_ROUNDS": num_rounds,
+         "NUM_GENERATORS": in_args.gen,
+ 
+diff --git a/run_random.py b/run_random.py
+--- a/run_random.py
++++ b/run_random.py
+@@ -21,10 +21,39 @@
+     parser.add_argument("--dataset", type=str, default="jinan")
+     parser.add_argument("--traffic_file", type=str, default="anon_3_4_jinan_real.json")
+ 
++    parser.add_argument("--seed", type=int, default=42, help="Global random seed (Auto-injected)")
+     return parser.parse_args()
+ 
+ 
+ def main(in_args):
++    # === [Auto-Injected] Global Seed Control ===
++    import random
++    import numpy as np
++    import os
++    
++    os.environ['PYTHONHASHSEED'] = str(in_args.seed)
++    random.seed(in_args.seed)
++    np.random.seed(in_args.seed)
++    
++    # seed TensorFlow if available
++    try:
++        import tensorflow as tf
++        tf.random.set_seed(in_args.seed)
++    except Exception:
++        pass
++        
++    # seed PyTorch if available
++    try:
++        import torch
++        torch.manual_seed(in_args.seed)
++        torch.cuda.manual_seed_all(in_args.seed)
++        torch.backends.cudnn.deterministic = True
++    except Exception:
++        pass
++        
++    print(f"\n[Auto-Init] global random seed set to: {in_args.seed}\n")
++    # ===========================================
++
+     traffic_file_list = []
+ 
+     if in_args.dataset == 'jinan':
+@@ -72,6 +101,7 @@
+     print(in_args.traffic_file)
+     process_list = []
+     dic_traffic_env_conf_extra = {
++        "SEED": in_args.seed,  # [Auto-Injected]
+         "NUM_AGENTS": num_intersections,
+         "NUM_INTERSECTIONS": num_intersections,
+         "MODEL_NAME": in_args.model,
+diff --git a/utils/cityflow_env.py b/utils/cityflow_env.py
+--- a/utils/cityflow_env.py
++++ b/utils/cityflow_env.py
+@@ -495,6 +495,8 @@
+         self.system_states = None
+         self.lane_length = None
+         self.waiting_vehicle_list = {}
++        self.severe_delay_events = []
++        self.vehicle_total_wait_time = {}
+ 
+         # check min action time
+         if self.dic_traffic_env_conf["MIN_ACTION_TIME"] <= self.dic_traffic_env_conf["YELLOW_TIME"]:
+@@ -565,6 +567,10 @@
+ 
+         for inter in self.list_intersection:
+             inter.update_current_measurements(self.system_states)
++
++        self.severe_delay_events = []
++        self.vehicle_total_wait_time = {}
++
+         state, done = self.get_state()
+ 
+         # create roadnet dict
+@@ -752,23 +758,31 @@
+             for v_id in vehicle_ids:
+                 v_info = self.eng.get_vehicle_info(v_id)
+                 speed = float(v_info["speed"])
++
++                # ====== [added] cumulative waiting time of every vehicle (for Gini) ======
++                clean_v_id = v_id[:-7] if "shadow" in v_id else v_id
+                 if speed < 0.1:
++                    if clean_v_id not in self.vehicle_total_wait_time:
++                        self.vehicle_total_wait_time[clean_v_id] = 0.0
++                    self.vehicle_total_wait_time[clean_v_id] += self.dic_traffic_env_conf["INTERVAL"]
++                # ===================================================
++
++                if speed < 0.1:
+                     if v_id not in self.waiting_vehicle_list:
+-                        self.waiting_vehicle_list[v_id] = {"time": None, "link": None}
+-                        self.waiting_vehicle_list[v_id]["time"] = self.dic_traffic_env_conf["INTERVAL"]
+-                        self.waiting_vehicle_list[v_id]["link"] = v_info['drivable']
++                        self.waiting_vehicle_list[v_id] = {"time": self.dic_traffic_env_conf["INTERVAL"], "link": v_info['drivable']}
+                     else:
+                         if self.waiting_vehicle_list[v_id]["link"] != v_info['drivable']:
+-                            self.waiting_vehicle_list[v_id] = {"time": None, "link": None}
+-                            self.waiting_vehicle_list[v_id]["time"] = self.dic_traffic_env_conf["INTERVAL"]
+-                            self.waiting_vehicle_list[v_id]["link"] = v_info['drivable']
++                            self._check_and_record_severe_delay(v_id)  # [added] close the wait on a segment change
++                            self.waiting_vehicle_list[v_id] = {"time": self.dic_traffic_env_conf["INTERVAL"], "link": v_info['drivable']}
+                         else:
+                             self.waiting_vehicle_list[v_id]["time"] += self.dic_traffic_env_conf["INTERVAL"]
+                 else:
+                     if v_id in self.waiting_vehicle_list:
++                        self._check_and_record_severe_delay(v_id)  # [added] close the wait when the vehicle leaves
+                         self.waiting_vehicle_list.pop(v_id)
+ 
+                 if v_id in self.waiting_vehicle_list and self.waiting_vehicle_list[v_id]["link"] != v_info['drivable']:
++                    self._check_and_record_severe_delay(v_id)  # [added] close the wait when the vehicle leaves (fallback)
+                     self.waiting_vehicle_list.pop(v_id)
+ 
+         self.system_states = {"get_lane_vehicles": self.eng.get_lane_vehicles(),
+@@ -819,6 +833,34 @@
+             dic_vehicle = self.list_intersection[inter_ind].get_dic_vehicle_arrive_leave_time()
+             df = pd.DataFrame.from_dict(dic_vehicle, orient="index")
+             df.to_csv(path_to_log_file, na_rep="nan")
++
++    def get_current_time(self):
++        return self.eng.get_current_time()
++
++    def _check_and_record_severe_delay(self, v_id, threshold=None):
++        if threshold is None:
++            threshold = self.dic_traffic_env_conf.get("DELAY_THRESHOLD", 90.0)
++
++        if v_id in self.waiting_vehicle_list:
++            veh_data = self.waiting_vehicle_list[v_id]
++            wait_time = veh_data.get("time", 0)
++
++            if wait_time and wait_time > threshold and not veh_data.get("recorded_severe_delay", False):
++                self.severe_delay_events.append({
++                    "vehicle_id": v_id,
++                    "link": veh_data.get("link", "unknown"),
++                    "wait_time": round(wait_time, 1),
++                    "exceed_time": round(wait_time - threshold, 1),
++                    "end_time": self.get_current_time()
++                })
++                veh_data["recorded_severe_delay"] = True
++
++    def get_severe_delay_events(self, threshold=None):
++        if threshold is None:
++            threshold = self.dic_traffic_env_conf.get("DELAY_THRESHOLD", 90.0)
++        for v_id in list(self.waiting_vehicle_list.keys()):
++            self._check_and_record_severe_delay(v_id, threshold)
++        return self.severe_delay_events
+ 
+     def batch_log(self, start, stop):
+         for inter_ind in range(start, stop):
+diff --git a/utils/config.py b/utils/config.py
+--- a/utils/config.py
++++ b/utils/config.py
+@@ -61,8 +61,8 @@
+     "NUM_INTERSECTIONS": 1,
+ 
+     "OBS_LENGTH": 167,
+-    "MIN_ACTION_TIME": 30,
+-    "MEASURE_TIME": 30,
++    "MIN_ACTION_TIME": 15,
++    "MEASURE_TIME": 15,
+ 
+     "BINARY_PHASE_EXPANSION": True,
+ 
+diff --git a/utils/construct_sample.py b/utils/construct_sample.py
+--- a/utils/construct_sample.py
++++ b/utils/construct_sample.py
+@@ -34,7 +34,7 @@
+         self.logging_data_list_per_gen = None
+         self.hidden_states_list = None
+         self.samples = []
+-        self.samples_all_intersection = [None]*self.dic_traffic_env_conf['NUM_INTERSECTIONS']
++        self.samples_all_intersection = [[] for _ in range(self.dic_traffic_env_conf['NUM_INTERSECTIONS'])]
+ 
+         self.interval = self.dic_traffic_env_conf["MIN_ACTION_TIME"]
+         self.measure_time = self.dic_traffic_env_conf["MEASURE_TIME"]
+diff --git a/utils/llm_aft_trainer.py b/utils/llm_aft_trainer.py
+--- a/utils/llm_aft_trainer.py
++++ b/utils/llm_aft_trainer.py
+@@ -3,7 +3,6 @@
+ import os
+ import time
+ import numpy as np
+-import wandb
+ from utils.cityflow_env import CityFlowEnv
+ import utils.config as config
+ from utils.aft_rank_loss_utils import *
+@@ -19,6 +18,12 @@
+ import copy
+ import random
+ 
++
++class _NoOpLogger:
++    """Logger that does nothing, used when WandB is disabled."""
++    def log(self, data):
++        pass
++
+ def merge(dic_tmp, dic_to_change):
+     dic_result = copy.deepcopy(dic_tmp)
+     dic_result.update(dic_to_change)
+@@ -313,14 +318,57 @@
+                     else:
+                         vehicle_travel_times[veh].append(leave_time - enter_time)
+ 
+-        total_travel_time = np.mean([sum(vehicle_travel_times[veh]) for veh in vehicle_travel_times])
++        # ---------- Gini and severe-delay statistics (Gini + 90s delay events) ----------
++        # 2. Gini coefficient & export the total waiting time of every vehicle
++        all_wait_times = list(self.env.vehicle_total_wait_time.values())
++        if len(all_wait_times) > 0:
++            wait_array = np.array(all_wait_times, dtype=np.float64)
++            wait_array = np.sort(wait_array)
++            n = len(wait_array)
++            index = np.arange(1, n + 1)
++            gini_coefficient = ((2 * index - n - 1) * wait_array).sum() / (n * wait_array.sum() + 1e-8)
++            gini_coefficient = round(gini_coefficient, 4)
+ 
++            import pandas as pd
++            df_wait = pd.DataFrame(list(self.env.vehicle_total_wait_time.items()), columns=['vehicle_id', 'total_wait_time'])
++            df_wait = df_wait.sort_values(by='total_wait_time', ascending=False)
++            df_wait.to_csv(os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "all_vehicles_wait_time.csv"), index=False)
++        else:
++            gini_coefficient = 0.0
++
++        # 3. export the waiting events above 90 s
++        severe_threshold = 90
++        delay_events = self.env.get_severe_delay_events(threshold=severe_threshold)
++        severe_count = len(delay_events)
++        if severe_count > 0:
++            import pandas as pd
++            df_events = pd.DataFrame(delay_events)
++            df_events = df_events.sort_values(by="exceed_time", ascending=False)
++            df_events.to_csv(os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], f"delay_events_over_{severe_threshold}s.csv"), index=False)
++
++        # 4. write the metric report
++        reward_log_path = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "test_metrics_log.txt")
++
++        awt = np.mean(waiting_time_episode) if len(waiting_time_episode) > 0 else 0.0
++        aql = np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0.0
++        # average travel time over the whole network
++        total_travel_time = np.mean([sum(vehicle_travel_times[veh]) for veh in vehicle_travel_times]) if vehicle_travel_times else 0.0
++
++        with open(reward_log_path, "w") as f:
++            f.write(f"AWT (average waiting time): {awt:.3f}\n")
++            f.write(f"AQL (average queue length): {aql:.3f}\n")
++            f.write(f"ATT (average travel time): {total_travel_time:.3f}\n")
++            f.write(f"Gini coefficient: {gini_coefficient}\n")
++            f.write(f"Severe delay events (>{severe_threshold}s): {severe_count}\n")
++        print(f"--> [simulation finished] metrics saved to: {self.dic_path['PATH_TO_WORK_DIRECTORY']}")
++
+         results = {
+             "env/collect_reward": total_reward,
+             "env/collect_avg_queue_len": np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "env/collect_queuing_vehicle_num": np.sum(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "env/collect_avg_waiting_time": np.mean(waiting_time_episode) if len(queue_length_episode) > 0 else 0,
+-            "env/collect_avg_travel_time": total_travel_time}
++            "env/collect_avg_travel_time": total_travel_time
++        }
+         print("Collect:", results)
+         f_state_action = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "state_action.json")
+         dump_json(state_action_log, f_state_action)
+@@ -509,7 +557,7 @@
+             fail_num = 0
+             vehicle_nums = self.get_vehicle_num(current_states)
+             for i, res in enumerate(responses):
+-                res = res[len(prompts[i]):]
++                #res = res[len(prompts[i]):]
+                 signal_answer_pattern = r'<signal>(.*?)</signal>'
+                 signals = re.findall(signal_answer_pattern, res)
+                 signal_text = signals[-1] if len(signals) > 0 else "ETWT"
+@@ -560,14 +608,57 @@
+                     else:
+                         vehicle_travel_times[veh].append(leave_time - enter_time)
+ 
+-        total_travel_time = np.mean([sum(vehicle_travel_times[veh]) for veh in vehicle_travel_times])
++        # ---------- Gini and severe-delay statistics (Gini + 90s delay events) ----------
++        # 2. Gini coefficient & export the total waiting time of every vehicle
++        all_wait_times = list(self.env.vehicle_total_wait_time.values())
++        if len(all_wait_times) > 0:
++            wait_array = np.array(all_wait_times, dtype=np.float64)
++            wait_array = np.sort(wait_array)
++            n = len(wait_array)
++            index = np.arange(1, n + 1)
++            gini_coefficient = ((2 * index - n - 1) * wait_array).sum() / (n * wait_array.sum() + 1e-8)
++            gini_coefficient = round(gini_coefficient, 4)
+ 
++            import pandas as pd
++            df_wait = pd.DataFrame(list(self.env.vehicle_total_wait_time.items()), columns=['vehicle_id', 'total_wait_time'])
++            df_wait = df_wait.sort_values(by='total_wait_time', ascending=False)
++            df_wait.to_csv(os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "all_vehicles_wait_time.csv"), index=False)
++        else:
++            gini_coefficient = 0.0
++
++        # 3. export the waiting events above 90 s
++        severe_threshold = 90
++        delay_events = self.env.get_severe_delay_events(threshold=severe_threshold)
++        severe_count = len(delay_events)
++        if severe_count > 0:
++            import pandas as pd
++            df_events = pd.DataFrame(delay_events)
++            df_events = df_events.sort_values(by="exceed_time", ascending=False)
++            df_events.to_csv(os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], f"delay_events_over_{severe_threshold}s.csv"), index=False)
++
++        # 4. write the metric report
++        reward_log_path = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "test_metrics_log.txt")
++
++        awt = np.mean(waiting_time_episode) if len(waiting_time_episode) > 0 else 0.0
++        aql = np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0.0
++        # average travel time over the whole network
++        total_travel_time = np.mean([sum(vehicle_travel_times[veh]) for veh in vehicle_travel_times]) if vehicle_travel_times else 0.0
++
++        with open(reward_log_path, "w") as f:
++            f.write(f"AWT (average waiting time): {awt:.3f}\n")
++            f.write(f"AQL (average queue length): {aql:.3f}\n")
++            f.write(f"ATT (average travel time): {total_travel_time:.3f}\n")
++            f.write(f"Gini coefficient: {gini_coefficient}\n")
++            f.write(f"Severe delay events (>{severe_threshold}s): {severe_count}\n")
++        print(f"--> [simulation finished] metrics saved to: {self.dic_path['PATH_TO_WORK_DIRECTORY']}")
++
+         results = {
+             "env/test_reward": total_reward,
+             "env/test_avg_queue_len": np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "env/test_queuing_vehicle_num": np.sum(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "env/test_avg_waiting_time": np.mean(waiting_time_episode) if len(queue_length_episode) > 0 else 0,
+-            "env/test_avg_travel_time": total_travel_time}
++            "env/test_avg_travel_time": total_travel_time
++        }
+         logger.log(results)
+         print("Test Round:", test_round, results)
+         f_state_action = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "state_action.json")
+@@ -581,12 +672,7 @@
+     def train_test(self):
+         print("================ Start PPO Fine-Tuning ================")
+         all_config = merge(merge(self.dic_agent_conf, self.dic_path), self.dic_traffic_env_conf)
+-        logger = wandb.init(
+-            project=self.dic_traffic_env_conf['PROJECT_NAME'],
+-            group=f"{self.dic_traffic_env_conf['MODEL_NAME']}-{self.roadnet}-{self.trafficflow}-{len(self.dic_traffic_env_conf['PHASE'])}_Phases",
+-            name=f"{self.dic_traffic_env_conf['TRAFFIC_FILE'].replace('.json', '')}",
+-            config=all_config,
+-        )
++        logger = _NoOpLogger()
+ 
+         rounds = self.dic_traffic_env_conf["NUM_ROUNDS"]
+         last_10_results = {"env/test_reward_over": [],
+@@ -614,7 +700,6 @@
+                 f"{self.dic_agent_conf['LLM_OUTPUT_DIR']}_{self.dic_traffic_env_conf['TRAFFIC_FILE'].replace('.json', '')}/my_checkpoint_{r}")
+ 
+         logger.log(last_10_results)
+-        wandb.finish()
+ 
+         self.llm_model.save_pretrained(f"{self.dic_agent_conf['LLM_OUTPUT_DIR']}_{self.dic_traffic_env_conf['TRAFFIC_FILE'].replace('.json', '')}")
+ 
+@@ -758,7 +843,7 @@
+             vehicle_nums = self.get_vehicle_num(current_states)
+             critic_actions = []
+             for i, res in enumerate(responses):
+-                res = res[len(prompts[i]):]
++                #res = res[len(prompts[i]):]
+                 signal_answer_pattern = r'<signal>(.*?)</signal>'
+                 signals = re.findall(signal_answer_pattern, res)
+                 signal_text = signals[-1] if len(signals) > 0 else "ETWT"
+@@ -809,14 +894,57 @@
+                     else:
+                         vehicle_travel_times[veh].append(leave_time - enter_time)
+ 
+-        total_travel_time = np.mean([sum(vehicle_travel_times[veh]) for veh in vehicle_travel_times])
++        # ---------- Gini and severe-delay statistics (Gini + 90s delay events) ----------
++        # 2. Gini coefficient & export the total waiting time of every vehicle
++        all_wait_times = list(self.env.vehicle_total_wait_time.values())
++        if len(all_wait_times) > 0:
++            wait_array = np.array(all_wait_times, dtype=np.float64)
++            wait_array = np.sort(wait_array)
++            n = len(wait_array)
++            index = np.arange(1, n + 1)
++            gini_coefficient = ((2 * index - n - 1) * wait_array).sum() / (n * wait_array.sum() + 1e-8)
++            gini_coefficient = round(gini_coefficient, 4)
+ 
++            import pandas as pd
++            df_wait = pd.DataFrame(list(self.env.vehicle_total_wait_time.items()), columns=['vehicle_id', 'total_wait_time'])
++            df_wait = df_wait.sort_values(by='total_wait_time', ascending=False)
++            df_wait.to_csv(os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "all_vehicles_wait_time.csv"), index=False)
++        else:
++            gini_coefficient = 0.0
++
++        # 3. export the waiting events above 90 s
++        severe_threshold = 90
++        delay_events = self.env.get_severe_delay_events(threshold=severe_threshold)
++        severe_count = len(delay_events)
++        if severe_count > 0:
++            import pandas as pd
++            df_events = pd.DataFrame(delay_events)
++            df_events = df_events.sort_values(by="exceed_time", ascending=False)
++            df_events.to_csv(os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], f"delay_events_over_{severe_threshold}s.csv"), index=False)
++
++        # 4. write the metric report
++        reward_log_path = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "test_metrics_log.txt")
++
++        awt = np.mean(waiting_time_episode) if len(waiting_time_episode) > 0 else 0.0
++        aql = np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0.0
++        # average travel time over the whole network
++        total_travel_time = np.mean([sum(vehicle_travel_times[veh]) for veh in vehicle_travel_times]) if vehicle_travel_times else 0.0
++
++        with open(reward_log_path, "w") as f:
++            f.write(f"AWT (average waiting time): {awt:.3f}\n")
++            f.write(f"AQL (average queue length): {aql:.3f}\n")
++            f.write(f"ATT (average travel time): {total_travel_time:.3f}\n")
++            f.write(f"Gini coefficient: {gini_coefficient}\n")
++            f.write(f"Severe delay events (>{severe_threshold}s): {severe_count}\n")
++        print(f"--> [simulation finished] metrics saved to: {self.dic_path['PATH_TO_WORK_DIRECTORY']}")
++
+         results = {
+             "test_reward_over": total_reward,
+             "test_avg_queue_len_over": np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "test_queuing_vehicle_num_over": np.sum(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "test_avg_waiting_time_over": np.mean(waiting_time_episode) if len(queue_length_episode) > 0 else 0,
+-            "test_avg_travel_time_over": total_travel_time}
++            "test_avg_travel_time_over": total_travel_time
++        }
+         logger.log(results)
+         print("Test Round:", test_round, results)
+         f_state_action = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "state_action.json")
+@@ -829,15 +957,9 @@
+ 
+     def train_test(self):
+         all_config = merge(merge(self.dic_agent_conf, self.dic_path), self.dic_traffic_env_conf)
+-        logger = wandb.init(
+-            project=self.dic_traffic_env_conf['PROJECT_NAME'],
+-            group=f"{self.dic_traffic_env_conf['MODEL_NAME']}-{self.roadnet}-{self.trafficflow}-{len(self.dic_traffic_env_conf['PHASE'])}_Phases",
+-            name=f"{self.dic_traffic_env_conf['TRAFFIC_FILE'].replace('.json', '')}",
+-            config=all_config,
+-        )
++        logger = _NoOpLogger()
+ 
+         self.test(logger, 0)
+-        wandb.finish()
+ 
+     '''
+     ======================= Class Utils =======================
+@@ -963,7 +1085,7 @@
+         start_time = time.time()
+         state_action_log = [[] for _ in range(len(state))]
+ 
+-        self.llm_model.eval()
++        # vLLM model has no .eval() method; inference mode is inherent
+         for step_num in tqdm(range(int(total_run_cnt / self.dic_traffic_env_conf['MIN_ACTION_TIME']))):
+             if done or current_time >= total_run_cnt:
+                 break
+@@ -996,7 +1118,7 @@
+             fail_num = 0
+             vehicle_nums = self.get_vehicle_num(current_states)
+             for i, res in enumerate(responses):
+-                res = res[len(prompts[i]):]
++                #res = res[len(prompts[i]):]
+                 signal_answer_pattern = r'<signal>(.*?)</signal>'
+                 signals = re.findall(signal_answer_pattern, res)
+                 signal_text = signals[-1] if len(signals) > 0 else "ETWT"
+@@ -1011,6 +1133,15 @@
+                 state_action_log[i][-1]["response"] = res
+                 state_action_log[i][-1]["action"] = eight_phase_list[action_list[i]]
+ 
++                # ==================== [added] write every answer in readable form to a TXT file ====================
++                response_log_path = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "llm_step_responses.txt")
++                with open(response_log_path, "a", encoding="utf-8") as f:
++                    f.write(f"> [simulation time: {current_time}s] Step: {step_num} | Intersection: {i}\n")
++                    f.write(f"[LLM raw answer]:\n{res}\n")
++                    f.write(f"[parsed action]: {signal_text} \n")
++                    f.write("-" * 60 + "\n")
++                # =================================================================================
++
+             next_state, _, done, _ = self.env.step(action_list)
+             rewards = self.get_norm_reward(next_state)  # my reward
+ 
+@@ -1047,14 +1178,57 @@
+                     else:
+                         vehicle_travel_times[veh].append(leave_time - enter_time)
+ 
+-        total_travel_time = np.mean([sum(vehicle_travel_times[veh]) for veh in vehicle_travel_times])
++        # ---------- Gini and severe-delay statistics (Gini + 90s delay events) ----------
++        # 2. Gini coefficient & export the total waiting time of every vehicle
++        all_wait_times = list(self.env.vehicle_total_wait_time.values())
++        if len(all_wait_times) > 0:
++            wait_array = np.array(all_wait_times, dtype=np.float64)
++            wait_array = np.sort(wait_array)
++            n = len(wait_array)
++            index = np.arange(1, n + 1)
++            gini_coefficient = ((2 * index - n - 1) * wait_array).sum() / (n * wait_array.sum() + 1e-8)
++            gini_coefficient = round(gini_coefficient, 4)
+ 
++            import pandas as pd
++            df_wait = pd.DataFrame(list(self.env.vehicle_total_wait_time.items()), columns=['vehicle_id', 'total_wait_time'])
++            df_wait = df_wait.sort_values(by='total_wait_time', ascending=False)
++            df_wait.to_csv(os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "all_vehicles_wait_time.csv"), index=False)
++        else:
++            gini_coefficient = 0.0
++
++        # 3. export the waiting events above 90 s
++        severe_threshold = 90
++        delay_events = self.env.get_severe_delay_events(threshold=severe_threshold)
++        severe_count = len(delay_events)
++        if severe_count > 0:
++            import pandas as pd
++            df_events = pd.DataFrame(delay_events)
++            df_events = df_events.sort_values(by="exceed_time", ascending=False)
++            df_events.to_csv(os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], f"delay_events_over_{severe_threshold}s.csv"), index=False)
++
++        # 4. write the metric report
++        reward_log_path = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "test_metrics_log.txt")
++
++        awt = np.mean(waiting_time_episode) if len(waiting_time_episode) > 0 else 0.0
++        aql = np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0.0
++        # average travel time over the whole network
++        total_travel_time = np.mean([sum(vehicle_travel_times[veh]) for veh in vehicle_travel_times]) if vehicle_travel_times else 0.0
++
++        with open(reward_log_path, "w") as f:
++            f.write(f"AWT (average waiting time): {awt:.3f}\n")
++            f.write(f"AQL (average queue length): {aql:.3f}\n")
++            f.write(f"ATT (average travel time): {total_travel_time:.3f}\n")
++            f.write(f"Gini coefficient: {gini_coefficient}\n")
++            f.write(f"Severe delay events (>{severe_threshold}s): {severe_count}\n")
++        print(f"--> [simulation finished] metrics saved to: {self.dic_path['PATH_TO_WORK_DIRECTORY']}")
++
+         results = {
+             "test_reward_over": total_reward,
+             "test_avg_queue_len_over": np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "test_queuing_vehicle_num_over": np.sum(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "test_avg_waiting_time_over": np.mean(waiting_time_episode) if len(queue_length_episode) > 0 else 0,
+-            "test_avg_travel_time_over": total_travel_time}
++            "test_avg_travel_time_over": total_travel_time
++        }
+         logger.log(results)
+         print("Test Round:", test_round, results)
+         f_state_action = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "state_action.json")
+@@ -1062,20 +1236,15 @@
+         print("Testing time: ", time.time() - start_time)
+ 
+         self.env.batch_log_2()
++        self.env.end_cityflow()
+ 
+         return results
+ 
+     def train_test(self):
+         all_config = merge(merge(self.dic_agent_conf, self.dic_path), self.dic_traffic_env_conf)
+-        logger = wandb.init(
+-            project=self.dic_traffic_env_conf['PROJECT_NAME'],
+-            group=f"{self.dic_traffic_env_conf['MODEL_NAME']}-{self.roadnet}-{self.trafficflow}-{len(self.dic_traffic_env_conf['PHASE'])}_Phases",
+-            name=f"{self.dic_traffic_env_conf['TRAFFIC_FILE'].replace('.json', '')}",
+-            config=all_config,
+-        )
++        logger = _NoOpLogger()
+ 
+         self.test(logger, 0)
+-        wandb.finish()
+ 
+     '''
+     ======================= Class Utils =======================
+diff --git a/utils/model_test.py b/utils/model_test.py
+--- a/utils/model_test.py
++++ b/utils/model_test.py
+@@ -98,7 +98,7 @@
+                 waiting_times.append(env.waiting_vehicle_list[veh]['time'])
+             waiting_time_episode.append(np.mean(waiting_times) if len(waiting_times) > 0 else 0.0)
+ 
+-        # wandb logger
++        # Vehicle travel time — computed first so ATT is available for the report below
+         vehicle_travel_times = {}
+         for inter in env.list_intersection:
+             arrive_left_times = inter.dic_vehicle_arrive_leave_time
+@@ -116,12 +116,55 @@
+ 
+         total_travel_time = np.mean([sum(vehicle_travel_times[veh]) for veh in vehicle_travel_times])
+ 
++        # ========== [added] post-episode statistics (Gini, severe delay events) ==========
++        # Calculate AWT and AQL
++        awt = round(np.mean(waiting_time_episode), 3) if len(waiting_time_episode) > 0 else 0
++        aql = round(np.mean(queue_length_episode), 3) if len(queue_length_episode) > 0 else 0
++
++        # Gini coefficient calculation and full wait-time export
++        all_wait_times = list(env.vehicle_total_wait_time.values())
++        if len(all_wait_times) > 0:
++            wait_array = np.array(all_wait_times, dtype=np.float64)
++            wait_array = np.sort(wait_array)
++            n = len(wait_array)
++            index = np.arange(1, n + 1)
++            gini_coefficient = ((2 * index - n - 1) * wait_array).sum() / (n * wait_array.sum() + 1e-8)
++            gini_coefficient = round(gini_coefficient, 4)
++
++            import pandas as pd
++            df_wait = pd.DataFrame(list(env.vehicle_total_wait_time.items()), columns=['vehicle_id', 'total_wait_time'])
++            df_wait = df_wait.sort_values(by='total_wait_time', ascending=False)
++            df_wait.to_csv(os.path.join(path_to_log, "all_vehicles_wait_time.csv"), index=False)
++        else:
++            gini_coefficient = 0.0
++
++        # Export 90s timeout details
++        severe_threshold = 90
++        delay_events = env.get_severe_delay_events(threshold=severe_threshold)
++        severe_count = len(delay_events)
++        if severe_count > 0:
++            import pandas as pd
++            df_events = pd.DataFrame(delay_events)
++            df_events = df_events.sort_values(by="exceed_time", ascending=False)
++            df_events.to_csv(os.path.join(path_to_log, f"delay_events_over_{severe_threshold}s.csv"), index=False)
++
++        # Write txt report
++        reward_log_path = os.path.join(path_to_log, "test_metrics_log.txt")
++        with open(reward_log_path, "w") as f:
++            f.write(f"AWT (average waiting time): {awt:.3f}\n")
++            f.write(f"AQL (average queue length): {aql:.3f}\n")
++            f.write(f"ATT (average travel time): {total_travel_time:.3f}\n")
++            f.write(f"Gini coefficient: {gini_coefficient}\n")
++            f.write(f"Severe delay events (>{severe_threshold}s): {severe_count}\n")
++
+         results = {
+             "test_reward": total_reward,
+             "test_avg_queue_len": np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "test_queuing_vehicle_num": np.sum(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "test_avg_waiting_time": np.mean(waiting_time_episode) if len(queue_length_episode) > 0 else 0,
+-            "test_avg_travel_time": total_travel_time}
++            "test_avg_travel_time": total_travel_time,
++            "test_gini": gini_coefficient,
++            "test_severe_delay_count": severe_count}
+         logger.log(results)
+ 
+         env.batch_log_2()
+@@ -132,7 +175,9 @@
+             "test_avg_queue_len_over": np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "test_queuing_vehicle_num_over": np.sum(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+             "test_avg_waiting_time_over": np.mean(waiting_time_episode) if len(queue_length_episode) > 0 else 0,
+-            "test_avg_travel_time_over": total_travel_time}
++            "test_avg_travel_time_over": total_travel_time,
++            "test_gini_over": gini_coefficient,
++            "test_severe_delay_count_over": severe_count}
+ 
+         return over_results, state_action_log
+ 
+diff --git a/utils/oneline.py b/utils/oneline.py
+--- a/utils/oneline.py
++++ b/utils/oneline.py
+@@ -2,11 +2,10 @@
+ from .my_utils import merge, get_state, get_state_detail, eight_phase_list, dump_json
+ from copy import deepcopy
+ from .cityflow_env import CityFlowEnv
+-from .pipeline import path_check, copy_cityflow_file, copy_conf_file
++from .pipeline import path_check, copy_cityflow_file, copy_conf_file, _NoOpLogger
+ import os
+ import time
+ import numpy as np
+-import wandb
+ from tqdm import tqdm
+ import threading
+ 
+@@ -82,12 +81,7 @@
+         current_time = self.env.get_current_time()  # in seconds
+ 
+         all_config = merge(merge(self.dic_agent_conf, self.dic_path), self.dic_traffic_env_conf)
+-        logger = wandb.init(
+-            project=self.dic_traffic_env_conf['PROJECT_NAME'],
+-            group=f"{self.dic_traffic_env_conf['MODEL_NAME']}-{self.roadnet}-{self.trafficflow}-{len(self.dic_traffic_env_conf['PHASE'])}_Phases",
+-            name=f"round_{round}",
+-            config=all_config,
+-        )
++        logger = _NoOpLogger()
+ 
+         start_time = time.time()
+         state_action_log = [[] for _ in range(len(state))]
+@@ -189,6 +183,49 @@
+ 
+         total_travel_time = np.mean([sum(vehicle_travel_times[veh]) for veh in vehicle_travel_times])
+ 
++        # ========== [added] post-episode statistics (Gini, severe delay events) ==========
++        # 1. basic metrics
++        awt = np.round(np.mean(waiting_time_episode), 3) if len(waiting_time_episode) > 0 else 0
++        aql = np.round(np.mean(queue_length_episode), 3) if len(queue_length_episode) > 0 else 0
++
++        # 2. Gini coefficient calculation and full wait-time export
++        all_wait_times = list(self.env.vehicle_total_wait_time.values())
++        path_to_log = self.dic_path["PATH_TO_WORK_DIRECTORY"]
++        if len(all_wait_times) > 0:
++            wait_array = np.array(all_wait_times, dtype=np.float64)
++            wait_array = np.sort(wait_array)
++            n = len(wait_array)
++            index = np.arange(1, n + 1)
++            gini_coefficient = ((2 * index - n - 1) * wait_array).sum() / (n * wait_array.sum() + 1e-8)
++            gini_coefficient = np.round(gini_coefficient, 4)
++
++            import pandas as pd
++            df_wait = pd.DataFrame(list(self.env.vehicle_total_wait_time.items()), columns=['vehicle_id', 'total_wait_time'])
++            df_wait = df_wait.sort_values(by='total_wait_time', ascending=False)
++            df_wait.to_csv(os.path.join(path_to_log, "all_vehicles_wait_time.csv"), index=False)
++        else:
++            gini_coefficient = 0.0
++
++        # 3. Export 90s timeout details
++        severe_threshold = 90
++        delay_events = self.env.get_severe_delay_events(threshold=severe_threshold)
++        severe_count = len(delay_events)
++        if severe_count > 0:
++            import pandas as pd
++            df_events = pd.DataFrame(delay_events)
++            df_events = df_events.sort_values(by="exceed_time", ascending=False)
++            df_events.to_csv(os.path.join(path_to_log, f"delay_events_over_{severe_threshold}s.csv"), index=False)
++
++        # 4. Write txt report
++        reward_log_path = os.path.join(path_to_log, "test_metrics_log.txt")
++        with open(reward_log_path, "w") as f:
++            f.write(f"AWT (average waiting time): {awt:.3f}\n")
++            f.write(f"AQL (average queue length): {aql:.3f}\n")
++            f.write(f"ATT (average travel time): {total_travel_time:.3f}\n")
++            f.write(f"Gini coefficient: {gini_coefficient}\n")
++            f.write(f"Severe delay events (>{severe_threshold}s): {severe_count}\n")
++        # =========================================================
++
+         results = {
+             "test_reward_over": total_reward,
+             "test_avg_queue_len_over": np.mean(queue_length_episode) if len(queue_length_episode) > 0 else 0,
+@@ -199,7 +236,6 @@
+         print(results)
+         f_state_action = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "state_action.json")
+         dump_json(state_action_log, f_state_action)
+-        wandb.finish()
+ 
+         print("Training time: ", time.time()-start_time)
+ 
+diff --git a/utils/pipeline.py b/utils/pipeline.py
+--- a/utils/pipeline.py
++++ b/utils/pipeline.py
+@@ -9,7 +9,6 @@
+ import time
+ from multiprocessing import Process
+ import numpy as np
+-import wandb
+ import copy
+ import pickle
+ from utils.cityflow_env import CityFlowEnv
+@@ -26,6 +25,15 @@
+ os.environ['NCCL_DEBUG'] = 'INFO'
+ 
+ 
++class _NoOpLogger:
++    """Logger that does nothing, used when WandB is disabled."""
++    def log(self, data):
++        pass
++
++    def log_summary(self, data):
++        pass
++
++
+ def merge(dic_tmp, dic_to_change):
+     dic_result = copy.deepcopy(dic_tmp)
+     dic_result.update(dic_to_change)
+@@ -111,14 +119,9 @@
+         f_time.write("generator_time\tmaking_samples_time\tupdate_network_time\ttest_evaluation_times\tall_times\n")
+         f_time.close()
+ 
+-        # wandb init
++        # wandb init (disabled)
+         all_config = merge(merge(self.dic_agent_conf, self.dic_path), self.dic_traffic_env_conf)
+-        logger = wandb.init(
+-            project=self.dic_traffic_env_conf['PROJECT_NAME'],
+-            group=f"{self.dic_traffic_env_conf['MODEL']}-{self.dic_traffic_env_conf['ROADNET_FILE']}-{self.dic_traffic_env_conf['TRAFFIC_FILE']}-{len(self.dic_traffic_env_conf['PHASE'])}_Phases",
+-            name=f"round_{round}",
+-            config=all_config,
+-        )
++        logger = _NoOpLogger()
+ 
+         last_10_results = {"test_reward_over": [],
+                            "test_avg_queue_len_over": [],
+@@ -225,6 +228,5 @@
+         print(last_10_results)
+         f_state_action = os.path.join(self.dic_path["PATH_TO_WORK_DIRECTORY"], "state_action.json")
+         dump_json(state_action_log, f_state_action)
+-        wandb.finish()
+ 
+         return results
+diff --git a/utils/utils.py b/utils/utils.py
+--- a/utils/utils.py
++++ b/utils/utils.py
+@@ -1,7 +1,6 @@
+ from .pipeline import Pipeline
+ from .oneline import OneLine
+ from . import config
+-import wandb
+ import copy
+ import numpy as np
+ import time
+@@ -10,6 +9,13 @@
+ location_dict_short = {"North": "N", "South": "S", "East": "E", "West": "W"}
+ location_direction_dict = ["NT", "NL", "ST", "SL", "ET", "EL", "WT", "WL"]
+ 
++
++class _NoOpLogger:
++    """Logger that does nothing, used when WandB is disabled."""
++    def log(self, data):
++        pass
++
++
+ def merge(dic_tmp, dic_to_change):
+     dic_result = copy.deepcopy(dic_tmp)
+     dic_result.update(dic_to_change)
+@@ -37,24 +43,30 @@
+         all_travel_time.append(round_results['test_avg_travel_time_over'])
+ 
+         # delete junk
+-        cmd_delete_model = 'find <dir> -type f ! -name "round_<round>_inter_*.h5" -exec rm -rf {} \;'.replace("<dir>", dic_path["PATH_TO_MODEL"]).replace("<round>", str(int(dic_traffic_env_conf["NUM_ROUNDS"] - 1)))
+-        cmd_delete_work = 'find <dir> -type f ! -name "state_action.json" -exec rm -rf {} \;'.replace("<dir>", dic_path["PATH_TO_WORK_DIRECTORY"])
+-        os.system(cmd_delete_model)
+-        os.system(cmd_delete_work)
++        #cmd_delete_model = 'find <dir> -type f ! -name "round_<round>_inter_*.h5" -exec rm -rf {} \;'.replace("<dir>", dic_path["PATH_TO_MODEL"]).replace("<round>", str(int(dic_traffic_env_conf["NUM_ROUNDS"] - 1)))
++        #cmd_delete_work = 'find <dir> -type f ! -name "state_action.json" -exec rm -rf {} \;'.replace("<dir>", dic_path["PATH_TO_WORK_DIRECTORY"])
++        #os.system(cmd_delete_model)
++        #os.system(cmd_delete_work)
+ 
+     results_table.append([np.average(all_rewards), np.average(all_queue_len), np.average(all_travel_time)])
+     results_table.append([np.std(all_rewards), np.std(all_queue_len), np.std(all_travel_time)])
+ 
+-    table_logger = wandb.init(
+-        project=dic_traffic_env_conf['PROJECT_NAME'],
+-        group=f"{dic_traffic_env_conf['MODEL']}-{roadnet}-{trafficflow}-{len(dic_traffic_env_conf['PHASE'])}_Phases",
+-        name="exp_results",
+-        config=merge(merge(dic_agent_conf, dic_path), dic_traffic_env_conf),
+-    )
+-    columns = ["reward", "avg_queue_len", "avg_travel_time"]
+-    logger_table = wandb.Table(columns=columns, data=results_table)
+-    table_logger.log({"results": logger_table})
+-    wandb.finish()
++    # Results table logged locally (WandB disabled)
++    print("=" * 60)
++    print("Experiment Results Summary")
++    print("=" * 60)
++    print(f"{'Metric':<25} {'Value':>15}")
++    print("-" * 40)
++    for row in results_table[:-2]:
++        print(f"{'reward':<25} {row[0]:>15.4f}")
++        print(f"{'avg_queue_len':<25} {row[1]:>15.4f}")
++        print(f"{'avg_travel_time':<25} {row[2]:>15.4f}")
++        print("-" * 40)
++    avg_row, std_row = results_table[-2], results_table[-1]
++    print(f"{'AVG reward':<25} {avg_row[0]:>15.4f}  (std: {std_row[0]:.4f})")
++    print(f"{'AVG avg_queue_len':<25} {avg_row[1]:>15.4f}  (std: {std_row[1]:.4f})")
++    print(f"{'AVG avg_travel_time':<25} {avg_row[2]:>15.4f}  (std: {std_row[2]:.4f})")
++    print("=" * 60)
+ 
+     print("pipeline_wrapper end")
+     return
+@@ -83,24 +95,30 @@
+         all_travel_time.append(round_results['test_avg_travel_time_over'])
+ 
+         # delete junk
+-        cmd_delete_model = 'rm -rf <dir>'.replace("<dir>", dic_path["PATH_TO_MODEL"])
+-        cmd_delete_work = 'find <dir> -type f ! -name "state_action.json" -exec rm -rf {} \;'.replace("<dir>", dic_path["PATH_TO_WORK_DIRECTORY"])
+-        os.system(cmd_delete_model)
+-        os.system(cmd_delete_work)
++        #cmd_delete_model = 'rm -rf <dir>'.replace("<dir>", dic_path["PATH_TO_MODEL"])
++        #cmd_delete_work = 'find <dir> -type f ! -name "state_action.json" -exec rm -rf {} \;'.replace("<dir>", dic_path["PATH_TO_WORK_DIRECTORY"])
++        #os.system(cmd_delete_model)
++        #os.system(cmd_delete_work)
+ 
+     results_table.append([np.average(all_rewards), np.average(all_queue_len), np.average(all_travel_time)])
+     results_table.append([np.std(all_rewards), np.std(all_queue_len), np.std(all_travel_time)])
+ 
+-    table_logger = wandb.init(
+-        project=dic_traffic_env_conf['PROJECT_NAME'],
+-        group=f"{dic_traffic_env_conf['MODEL_NAME']}-{roadnet}-{trafficflow}-{len(dic_agent_conf['FIXED_TIME'])}_Phases",
+-        name="exp_results",
+-        config=merge(merge(dic_agent_conf, dic_path), dic_traffic_env_conf),
+-    )
+-    columns = ["reward", "avg_queue_len", "avg_travel_time"]
+-    logger_table = wandb.Table(columns=columns, data=results_table)
+-    table_logger.log({"results": logger_table})
+-    wandb.finish()
++    # Results table logged locally (WandB disabled)
++    print("=" * 60)
++    print("Experiment Results Summary")
++    print("=" * 60)
++    print(f"{'Metric':<25} {'Value':>15}")
++    print("-" * 40)
++    for row in results_table[:-2]:
++        print(f"{'reward':<25} {row[0]:>15.4f}")
++        print(f"{'avg_queue_len':<25} {row[1]:>15.4f}")
++        print(f"{'avg_travel_time':<25} {row[2]:>15.4f}")
++        print("-" * 40)
++    avg_row, std_row = results_table[-2], results_table[-1]
++    print(f"{'AVG reward':<25} {avg_row[0]:>15.4f}  (std: {std_row[0]:.4f})")
++    print(f"{'AVG avg_queue_len':<25} {avg_row[1]:>15.4f}  (std: {std_row[1]:.4f})")
++    print(f"{'AVG avg_travel_time':<25} {avg_row[2]:>15.4f}  (std: {std_row[2]:.4f})")
++    print("=" * 60)
+ 
+     return
+ 

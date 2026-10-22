@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<configuration>
+    <input>
+        <net-file value="anon_3_4_jinan_real_2000.net.xml" />
+        <route-files value="anon_3_4_jinan_real_2000.repaired.rou.xml" />
+    </input>
+    <time>
+        <begin value="0" />
+        <end value="3600" />
+        <step-length value="1.0" />
+    </time>
+    <processing>
+        <time-to-teleport value="-1" />
+        <waiting-time-memory value="10000" />
+        <lanechange.duration value="0" />
+        <collision.action value="warn" />
+        <collision.check-junctions value="true" />
+    </processing>
+    <report>
+        <no-step-log value="true" />
+        <no-warnings value="true" />
+    </report>
+</configuration>

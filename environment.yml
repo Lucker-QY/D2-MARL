@@ -1,0 +1,26 @@
+# Environment used for all experiments of the paper (D2-MARL and the TensorFlow
+# baselines, on CityFlow and SUMO). Exported from the original conda environment
+# and reduced to the packages this code needs.
+#
+#   conda env create -f environment.yml
+#   conda activate d2marl
+#
+# CityFlow and SUMO are installed separately, see README.md:
+#   * CityFlow 0.1, built from https://github.com/cityflow-project/CityFlow (Linux)
+#   * SUMO 1.20.0 with SUMO_HOME set; traci and sumolib are taken from $SUMO_HOME/tools
+name: d2marl
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.6.15
+  - pip=21.3.1
+  - pip:
+      - tensorflow==2.4.0        # the experiments used tensorflow-gpu==2.4.0 on CPU only
+      - numpy==1.19.5
+      - pandas==1.1.5
+      - h5py==2.10.0
+      - protobuf==3.19.6
+      - matplotlib==3.3.4
+      - seaborn==0.11.2
+      - scipy==1.5.4

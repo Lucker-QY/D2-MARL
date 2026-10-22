@@ -1,0 +1,104 @@
+{
+  "description": "Settings of Table I of the paper. 'shared' are the LLMTSCS defaults (utils/config.py), 'method' the constants of D2-MARL that are identical in all scenarios (defaults of run_d2marl.py), 'scenario' the delay weight omega_w, the only scenario-dependent quantity, and the run_d2marl.py flags of each network. The non-grid networks additionally use the adaptation of Section IV-C (-spillback).",
+  "shared": {
+    "horizon_s": 3600,
+    "rounds": 100,
+    "action_interval_s": 15,
+    "yellow_s": 5,
+    "top_k_adjacency": 5,
+    "learning_rate": 0.001,
+    "gamma": 0.8,
+    "reward_normalisation_eta": 20,
+    "replay_buffer": 12000,
+    "batch_size": 20,
+    "target_update_every_rounds": 5,
+    "epsilon": {
+      "start": 0.8,
+      "decay": 0.95,
+      "min": 0.2
+    }
+  },
+  "method": {
+    "omega_q": 0.5,
+    "omega_o": 0.25,
+    "huber_delta_s": 30,
+    "penalty_cap": 2000,
+    "replay_threshold_tau_p": -50.0,
+    "max_penalty_ratio_rho": 0.05,
+    "spatial_heads": 5,
+    "spatial_dim": 128,
+    "intra_heads": 1,
+    "intra_dim": 32,
+    "gating_hidden_units": 16
+  },
+  "scenario": {
+    "hangzhou": {
+      "W_s": 60,
+      "W_h": 90,
+      "tau": 60,
+      "omega_w": 0.1,
+      "flags": [
+        "-hangzhou",
+        "-weight_max_wait",
+        "-0.1"
+      ]
+    },
+    "jinan": {
+      "W_s": 60,
+      "W_h": 90,
+      "tau": 60,
+      "omega_w": 0.05,
+      "flags": [
+        "-jinan"
+      ]
+    },
+    "newyork163": {
+      "W_s": 60,
+      "W_h": 90,
+      "tau": 60,
+      "omega_w": 0.05,
+      "flags": [
+        "-newyork163"
+      ]
+    },
+    "ingolstadt21": {
+      "W_s": 60,
+      "W_h": 90,
+      "tau": 60,
+      "omega_w": 0.05,
+      "flags": [
+        "-ingolstadt21",
+        "-sumo",
+        "-spillback"
+      ],
+      "simulator": "SUMO only"
+    },
+    "cologne8": {
+      "W_s": 60,
+      "W_h": 90,
+      "tau": 60,
+      "omega_w": 0.05,
+      "flags": [
+        "-cologne8",
+        "-sumo",
+        "-spillback"
+      ],
+      "simulator": "SUMO only"
+    }
+  },
+  "seeds": [
+    10,
+    100,
+    1000
+  ],
+  "nongrid_adaptation": {
+    "free_storage_ratio_inputs": [
+      "spatial",
+      "gate",
+      "intra-phase"
+    ],
+    "intra_phase_tokens": "4 x 11",
+    "pressure_discount_c0": 0.2,
+    "vehicle_space_m": 7.5
+  }
+}

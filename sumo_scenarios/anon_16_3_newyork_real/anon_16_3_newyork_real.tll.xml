@@ -1,0 +1,483 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tlLogics xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tllogic_file.xsd">
+    <tlLogic id="intersection_1_1" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_10" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_11" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_12" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_13" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_14" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_15" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_16" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_2" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_3" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_4" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_5" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_6" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_7" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_8" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_1_9" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_1" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_10" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_11" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_12" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_13" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_14" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_15" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_16" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_2" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_3" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_4" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_5" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_6" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_7" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_8" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_2_9" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_1" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_10" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_11" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_12" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_13" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_14" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_15" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_16" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_2" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_3" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_4" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_5" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_6" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_7" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_8" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+    <tlLogic id="intersection_3_9" offset="0" programID="0" type="static">
+        <phase duration="30" state="GGGrrrrrrGGGGGGrrrGGGrrrrrrGGGGGGrrr" />
+        <phase duration="5" state="GGGrrrrrrGGGyyyrrrGGGrrrrrrGGGyyyrrr" />
+        <phase duration="30" state="GGGGGGrrrGGGrrrrrrGGGGGGrrrGGGrrrrrr" />
+        <phase duration="5" state="GGGyyyrrrGGGrrrrrrGGGyyyrrrGGGrrrrrr" />
+        <phase duration="30" state="GGGrrrrrrGGGrrrGGGGGGrrrrrrGGGrrrGGG" />
+        <phase duration="5" state="GGGrrrrrrGGGrrryyyGGGrrrrrrGGGrrryyy" />
+        <phase duration="30" state="GGGrrrGGGGGGrrrrrrGGGrrrGGGGGGrrrrrr" />
+        <phase duration="5" state="GGGrrryyyGGGrrrrrrGGGrrryyyGGGrrrrrr" />
+    </tlLogic>
+</tlLogics>

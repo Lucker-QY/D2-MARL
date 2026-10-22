@@ -1,0 +1,35 @@
+{
+  "description": "Ablation variants of the paper and the run_d2marl.py flags that produce them (added to the scenario flags of configs/table1.json).",
+  "variants": {
+    "full": [],
+    "NA": [
+      "-no_extended_state",
+      "-no_max_wait_time",
+      "-no_wait_penalty",
+      "-no_intra_phase_attention",
+      "-no_stratified_replay"
+    ],
+    "ES": [
+      "-no_extended_state"
+    ],
+    "WP": [
+      "-no_wait_penalty"
+    ],
+    "MW": [
+      "-no_max_wait_time"
+    ],
+    "IA": [
+      "-no_intra_phase_attention"
+    ],
+    "RP": [
+      "-no_stratified_replay"
+    ]
+  },
+  "notes": {
+    "ES": "removes the extended state (max waiting time, over-limit count) and the over-limit reward term",
+    "MW": "removes the delay-burden state feature (lane_delay_burden)",
+    "WP": "removes the bounded delay penalty from the reward",
+    "IA": "removes the intra-phase attention branch (and with it the gate)",
+    "RP": "plain random replay instead of stratified replay"
+  }
+}
